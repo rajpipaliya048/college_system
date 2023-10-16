@@ -1,0 +1,69 @@
+from django import forms
+from .models import Student
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+import re
+from django.utils.translation import gettext_lazy as __
+from django.contrib.auth.forms import UserCreationForm
+from django_countries.fields import CountryField
+
+
+def validate_number(value):
+    if not re.match(r'^\d{10}$', value):
+        raise ValidationError(
+            __("Please enter valid mobile number"),
+            params={"value": value},
+        )
+        
+def validate_name(value):
+    if not re.match(r'^[A-Za-z]+$', value):
+        raise ValidationError(
+            __("Please enter valid mobile number"),
+            params={"value": value},
+        )
+        
+def validate_age(value):
+    if value <= 0:
+        raise ValidationError(
+            __("Please enter valid age"),
+            params={"value": value},
+        )
+    
+class StudentForm(UserCreationForm):
+    first_name = forms.CharField(max_length=50, min_length=3, validators=[validate_name])
+    last_name = forms.CharField(max_length=50, min_length=3, validators=[validate_name])
+    email = forms.EmailField()
+    age = forms.IntegerField(validators=[validate_age])
+    country = CountryField().formfield()
+    mobile_number = forms.CharField(max_length=10, min_length=10, validators=[validate_number])
+    gender_choice = (
+        ("male", "male"),
+        ("female", "female"),
+    )
+    gender = forms.ChoiceField(choices=gender_choice,)
+    education_choice = (
+        ('10th pass', '10th pass'),
+        ('12th pass', '12th pass'),
+        ('graduation', 'graduation'),
+        ('post_graduation', 'post graduation'),        
+    )
+    level_of_education = forms.ChoiceField(choices=education_choice, required=True)
+    
+    class Meta:
+        model = User
+        fields = ('first_name','last_name', 'username', 'email', 'password1' ,'password2', 
+                  'age', 'country', 'mobile_number', 'gender', 'level_of_education' )
+    
+    
+    def save(self, commit=True):
+        if not commit:
+            raise NotImplementedError("Can't create User and UserProfile without database save")
+        user = super(StudentForm, self).save(commit=True)
+        student_profile = Student(user=user, age=self.cleaned_data['age'], 
+            country=self.cleaned_data['country'],
+            mobile_number=self.cleaned_data['mobile_number'],
+            gender=self.cleaned_data['gender'],
+            level_of_education=self.cleaned_data['level_of_education'],
+            )
+        student_profile.save()
+        return user, student_profile
