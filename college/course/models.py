@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 import re
+from django.shortcuts import reverse
 from users.models import Student
 
 
@@ -30,8 +31,15 @@ class Course(models.Model):
         return self.course_name
     
     
+    def snippet(self):
+        return self.course_details[:50] + '...'  
+    
 class Enrollment(models.Model):
     user_id = models.ForeignKey(Student, on_delete= models.CASCADE)
     course_id = models.ForeignKey(Course, on_delete= models.CASCADE)
     enrollment_date = models.DateField()
     isactive = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.user_id.user.username
+    

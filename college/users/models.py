@@ -12,7 +12,7 @@ class Student(models.Model):
     graduation = 'graduation'
     post_graduation = 'post_graduation'
     
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=False, primary_key=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     age = models.PositiveBigIntegerField()
     country = CountryField()
     mobile_number = models.IntegerField()
@@ -26,4 +26,4 @@ class Student(models.Model):
     level_of_education = models.CharField(max_length=20, choices=education_choice,)
     
     def __str__(self):
-        return self.user
+        return self.user.username

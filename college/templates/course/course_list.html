@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-center">Courses</h1>
+<div class="courses container">
+    <div class="row">
+        {% for course in courses %}
+        <div class="card m-5" style="width: 18rem;">
+            <form class="form" action="/course/enroll/" method="post">
+                {% csrf_token %}
+                <img src="{{ course.course_img.url }}" class="card-img-top" alt="">
+                <div class="card-body">
+                  <h5 class="card-title">{{ course.course_name }}</h5>
+                  <p class="card-text">{{ course.snippet }}</p>
+                  <p class="card-text fw-bolder">{{ course.department }}</p>
+                  <p class="card-text">{{ course.start_course }}</p>
+                  <p class="card-text">{{ course.end_course }}</p>
+                </div>
+                <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                <div class="text-center">
+                    <input type = "submit" value = "Enroll Now" class="btn btn-success fw-bolder mb-3" />
+                </div>
+            </form>
+          </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock%}
