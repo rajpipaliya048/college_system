@@ -14,13 +14,17 @@ class Department(models.Model):
     department_name = models.CharField(max_length=50, unique=True)
     departmrnt_slug = models.SlugField(max_length=10)
     
+    def __str__(self):
+        return self.department_name
 
 class Course(models.Model):
     course_id = models.CharField(max_length=6, primary_key=True, validators=[validate_course_id])
     course_name = models.CharField(max_length=256)
     course_details = models.CharField(max_length=500, blank=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    
+    course_img = models.ImageField(blank=True, upload_to='course-images/')
+    start_course = models.DateField(null=True)
+    end_course = models.DateField(null=True)    
     
     def __str__(self):
         return self.course_name
