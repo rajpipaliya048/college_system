@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from users import views as user_views
+from users.views import SignupView, LoginView, LogoutView
 from django.conf.urls.static import static
 from django.conf import settings
 from . import views
@@ -10,9 +10,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('login/', user_views.login_view, name = 'login'),
-    path('signup/', user_views.signup_view, name = 'signup'),
-    path('logout/', user_views.logout_view, name = 'logout'),
+    path('login/', LoginView.as_view(), name = 'login'),
+    path('signup/', SignupView.as_view(), name = 'signup'),
+    path('logout/', LogoutView.as_view(), name = 'logout'),
     path('course/', include('course.urls')),
 ]
 
