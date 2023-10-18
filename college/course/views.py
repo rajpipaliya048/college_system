@@ -9,14 +9,12 @@ import datetime
 from users.models import Student
 
 class CreateCourseView(View):
-    # @user_passes_test(lambda u: u.is_superuser)
     def get(self, request):
         form = CourseForm()
         return render(request, 'course/create_course.html', {'form': form })
 
     def post(self, request):
         form = CourseForm(request.POST, request.FILES)
-        # import pdb;pdb.set_trace()
         if form.is_valid():
             course = form.save()
             return HttpResponseRedirect('/course/list/')
@@ -26,8 +24,6 @@ class CreateCourseView(View):
 class CourseListView(View):
     def get(self, request):
         courses = Course.objects.all()
-        student = get_object_or_404(Student, user=self.request.user.id)
-        enrolled_or_not = Enrollment.objects.filter(user_id=student)
         return render(request, 'course/course_list.html', {'courses': courses })
 
 class CourseEnrollView(View):
