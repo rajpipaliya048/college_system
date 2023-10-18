@@ -16,9 +16,13 @@
                   <p class="card-text">{{ course.end_course }}</p>
                 </div>
                 <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                {% if not course.Enrollment %}
                 <div class="text-center">
                     <input type = "submit" value = "Enroll Now" class="btn btn-success fw-bolder mb-3" />
                 </div>
+                {% else %}
+                <h2>Enrolled</h2>
+                {% endif %}
             </form>
           </div>
         {% endfor %}
