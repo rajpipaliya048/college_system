@@ -6,6 +6,8 @@
     <div class="row">
         {% for course in courses %}
         <div class="card m-5" style="width: 18rem;">
+          <form class="form" action="/course/unenroll/" method="post">
+              {% csrf_token %}
                 <img src="{{ course.course_img.url }}" class="card-img-top" alt="">
                 <div class="card-body">
                   <h5 class="card-title">{{ course.course_name }}</h5>
@@ -14,6 +16,11 @@
                   <p class="card-text">{{ course.start_course }}</p>
                   <p class="card-text">{{ course.end_course }}</p>
                 </div>
+                <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                <div class="text-center">
+                    <input type = "submit" value = "Un-Enroll" class="btn btn-danger fw-bolder mb-3" />
+                </div>
+              </form>
           </div>
         {% endfor %}
     </div>
