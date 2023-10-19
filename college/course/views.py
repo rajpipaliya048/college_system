@@ -30,20 +30,27 @@ class CourseEnrollView(View):
     
     @method_decorator(login_required)
     def post(self, *args, **kwargs):
-        student = get_object_or_404(Student, user=self.request.user.id)
-        current_date = datetime.date.today()
+        student = self.request.user.student
         course_id = self.request.POST.get('course_id')
-        course = get_object_or_404(Course, course_id=course_id)
-        enrolled = Enrollment.objects.get_or_create(user_id=student, course_id=course, enrollment_date=current_date)
+        student = self.request.user.student
+        obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
+        if obj:
+            obj.isactive = True
+            obj.save()
+        else:
+            
+            current_date = datetime.date.today()
+            course_id = self.request.POST.get('course_id')
+            course = get_object_or_404(Course, course_id=course_id)
+            enrolled = Enrollment.objects.get_or_create(user_id=student, course_id=course, enrollment_date=current_date)
         return redirect('course_list')
     
     
 class CourseUnenrollView(View):
-    
     def post(self, *args, **kwargs):
         course_id = self.request.POST.get('course_id')
-        student = get_object_or_404(Student, user=self.request.user.id)
-        query = Enrollment.objects.filter(course_id=course_id)
-        obj = get_object_or_404(query, user_id=student)
-        obj.delete()
-        return redirect('course_list') 
+        student = self.request.user.student
+        obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
+        obj.isactive = False
+        obj.save()
+        return redirect('course_list')

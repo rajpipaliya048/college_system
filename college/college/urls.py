@@ -17,7 +17,7 @@ urlpatterns = [
     path('course/', include('course.urls')),
     path('account_activation_sent/', userviews.account_activation_sent, name='account_activation_sent'),
     path('activate/<uidb64>/<token>/', userviews.activate, name='activate'),
-    path('/account_activation_complete/', userviews.account_activation_complete, name='account_activation_complete'),
+    path('account_activation_complete/', userviews.account_activation_complete, name='account_activation_complete'),
 ]
 
 
