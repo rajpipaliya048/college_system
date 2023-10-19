@@ -54,16 +54,3 @@ class StudentForm(UserCreationForm):
         fields = ('first_name','last_name', 'username', 'email', 'password1' ,'password2', 
                   'age', 'country', 'mobile_number', 'gender', 'level_of_education' )
     
-    
-    def save(self, commit=True):
-        if not commit:
-            raise NotImplementedError("Can't create User and UserProfile without database save")
-        user = super(StudentForm, self).save(commit=True)
-        student_profile = Student(user=user, age=self.cleaned_data['age'], 
-            country=self.cleaned_data['country'],
-            mobile_number=self.cleaned_data['mobile_number'],
-            gender=self.cleaned_data['gender'],
-            level_of_education=self.cleaned_data['level_of_education'],
-            )
-        student_profile.save()
-        return user, student_profile
