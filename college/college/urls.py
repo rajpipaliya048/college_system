@@ -5,6 +5,7 @@ from users.views import SignupView, LoginView, LogoutView
 from django.conf.urls.static import static
 from django.conf import settings
 from . import views
+from users import views as userviews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -14,6 +15,9 @@ urlpatterns = [
     path('signup/', SignupView.as_view(), name = 'signup'),
     path('logout/', LogoutView.as_view(), name = 'logout'),
     path('course/', include('course.urls')),
+    path('account_activation_sent/', userviews.account_activation_sent, name='account_activation_sent'),
+    path('activate/<uidb64>/<token>/', userviews.activate, name='activate'),
+    path('/account_activation_complete/', userviews.account_activation_complete, name='account_activation_complete'),
 ]
 
 
