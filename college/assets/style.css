@@ -43,3 +43,9 @@
 .course span {
     font-weight: bolder;
 }
+
+.logo {
+    width: 200px;
+    height: 100px;
+    margin-left: 50px;
+}

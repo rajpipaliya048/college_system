@@ -11,8 +11,11 @@ from django.views.generic.detail import DetailView
 
 class CreateCourseView(View):
     def get(self, request):
-        form = CourseForm()
-        return render(request, 'course/create_course.html', {'form': form })
+        if request.user.is_superuser:
+            form = CourseForm()
+            return render(request, 'course/create_course.html', {'form': form })
+        else:
+            return redirect('course:course_list')
 
     def post(self, request):
         form = CourseForm(request.POST, request.FILES)

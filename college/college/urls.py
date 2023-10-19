@@ -5,11 +5,12 @@ from users.views import SignupView, LoginView, LogoutView
 from django.conf.urls.static import static
 from django.conf import settings
 from . import views
+from course.views import CourseListView
 from users import views as userviews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
+    path('', CourseListView.as_view(), name='home'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('login/', LoginView.as_view(), name = 'login'),
     path('signup/', SignupView.as_view(), name = 'signup'),

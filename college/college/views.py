@@ -10,11 +10,6 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str
 from django.contrib.auth import login, logout
 
-
-
-def home(request):
-    return render(request, 'index.html')
-
 @login_required
 def dashboard(request):
     user = request.user
