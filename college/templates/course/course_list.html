@@ -5,8 +5,6 @@
     <div class="row">
         {% for course in courses %}
         <div class="card m-5" style="width: 18rem;">
-            <form class="form" action="/course/enroll/" method="post">
-                {% csrf_token %}
                 <img src="{{ course.course_img.url }}" class="card-img-top" alt="">
                 <div class="card-body">
                   <h5 class="card-title">{{ course.course_name }}</h5>
@@ -15,14 +13,9 @@
                   <p class="card-text">{{ course.start_course }}</p>
                   <p class="card-text">{{ course.end_course }}</p>
                 </div>
-                <input type="hidden" name="course_id" value="{{ course.course_id }}">
-                {% if not course.Enrollment %}
                 <div class="text-center">
-                    <input type = "submit" value = "Enroll Now" class="btn btn-success fw-bolder mb-3" />
+                    <a class="btn btn-success fw-bolder mb-3"  href="{% url 'course:detail' course_id=course.course_id %}">View course</a>
                 </div>
-                {% else %}
-                <h2>Enrolled</h2>
-                {% endif %}
             </form>
           </div>
         {% endfor %}

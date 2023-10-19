@@ -6,7 +6,8 @@ from .models import Course, Enrollment
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 import datetime
-from users.models import Student
+from django.views.generic.detail import DetailView
+
 
 class CreateCourseView(View):
     def get(self, request):
@@ -43,7 +44,7 @@ class CourseEnrollView(View):
             course_id = self.request.POST.get('course_id')
             course = get_object_or_404(Course, course_id=course_id)
             enrolled = Enrollment.objects.get_or_create(user_id=student, course_id=course, enrollment_date=current_date)
-        return redirect('course_list')
+        return redirect('dashboard')
     
     
 class CourseUnenrollView(View):
@@ -53,4 +54,9 @@ class CourseUnenrollView(View):
         obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
         obj.isactive = False
         obj.save()
-        return redirect('course_list')
+        return redirect('course:course_list')
+   
+
+def course_detail_view(request, course_id):
+    course = get_object_or_404(Course, course_id=course_id)
+    return render(request, 'course/course_detail.html', context={'course': course})
