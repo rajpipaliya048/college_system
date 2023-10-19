@@ -1,3 +1,51 @@
 .errorlist {
     color: red;
 }
+
+.course-detail .course{
+    padding: 0;
+}
+
+.course-detail  .course img{
+    max-width: 100%;
+}
+
+.course-detail  .course h2{
+    text-align: center;
+    margin: 20px auto;
+    font-size: 2em
+}
+
+.course-detail .course h3{
+    text-align: center;
+}
+
+.course-detail  .course p{
+    margin: 10px 20px
+}
+
+.course{
+    padding: 10px;
+    border: 1px solid #00dba0;
+    position: relative;
+    padding-bottom: 40px;
+    margin-top: 50px;
+}
+
+.course h2{
+    font-size: 1.2em;
+}
+
+.course h5 {
+    margin: 10px 20px;
+}
+
+.course span {
+    font-weight: bolder;
+}
+
+.logo {
+    width: 200px;
+    height: 100px;
+    margin-left: 50px;
+}
