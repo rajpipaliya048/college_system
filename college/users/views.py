@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout
 from django.views import View
@@ -92,3 +92,9 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('login')
+
+@login_required
+def user_profile(request):
+    user = request.user
+    student = get_object_or_404(Student, user=user)
+    return render(request, 'users/user_profile.html', {'student': student})

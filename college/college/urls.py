@@ -15,6 +15,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name = 'login'),
     path('signup/', SignupView.as_view(), name = 'signup'),
     path('logout/', LogoutView.as_view(), name = 'logout'),
+    path('profile/', userviews.user_profile, name = 'profile'),
     path('course/', include('course.urls')),
     path('paypal/', include('paypal.standard.ipn.urls')),
     path('account_activation_sent/', userviews.account_activation_sent, name='account_activation_sent'),
