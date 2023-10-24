@@ -1,12 +1,19 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect
-from django.views import View
-from .forms import CourseForm
-from .models import Course, Enrollment
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 import datetime
-from django.views.generic.detail import DetailView
+from .forms import CourseForm
+from .models import Course
+from .models import Course, Enrollment
+from decimal import Decimal
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from paypal.standard.forms import PayPalPaymentsForm
+
 
 
 class CreateCourseView(View):
@@ -29,27 +36,51 @@ class CourseListView(View):
     def get(self, request):
         courses = Course.objects.all()
         return render(request, 'course/course_list.html', {'courses': courses })
-
+    
 class CourseEnrollView(View):
     
     @method_decorator(login_required)
-    def post(self, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         student = self.request.user.student
+        user = self.request.user
         course_id = self.request.POST.get('course_id')
-        student = self.request.user.student
-        obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
-        if obj:
-            obj.isactive = True
-            obj.save()
-        else:
+        student = self.request.user.student           
+        current_date = datetime.date.today()
+        course_id = self.request.POST.get('course_id')
+        course = get_object_or_404(Course, course_id=course_id)
+        enrolled = Enrollment.objects.get_or_create(user_id=student, course_id=course, enrollment_date=current_date,)
+
+        
+        if course.fees != 0:    
+            host = request.get_host()
+
+            paypal_dict = {
+                "business": settings.PAYPAL_RECEIVER_EMAIL,
+                "amount": course.fees,
+                "item_name": "name of the item",
+                "currency_code": "USD",
+                'notify_url': 'http://{}{}'.format(host,reverse('paypal-ipn')),
+                'return_url': 'http://{}{}'.format(host,reverse('course:payment_done')),
+                'cancel_return': 'http://{}{}'.format(host,reverse('course:payment_cancelled')),
+            }
+            form = PayPalPaymentsForm(initial=paypal_dict)
+            return render(request, 'course/process_payment.html', {'course': course, 'form': form})
             
-            current_date = datetime.date.today()
-            course_id = self.request.POST.get('course_id')
-            course = get_object_or_404(Course, course_id=course_id)
-            enrolled = Enrollment.objects.get_or_create(user_id=student, course_id=course, enrollment_date=current_date)
+        else:
+            obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
+            obj.isactive = True
+            obj.save() 
         return redirect('dashboard')
-    
-    
+
+@csrf_exempt
+def payment_done(request):
+    return render(request, 'course/payment_done.html')
+
+
+@csrf_exempt
+def payment_canceled(request):
+    return render(request, 'course/payment_cancelled.html')
+
 class CourseUnenrollView(View):
     def post(self, *args, **kwargs):
         course_id = self.request.POST.get('course_id')
@@ -62,4 +93,4 @@ class CourseUnenrollView(View):
 
 def course_detail_view(request, course_id):
     course = get_object_or_404(Course, course_id=course_id)
-    return render(request, 'course/course_detail.html', context={'course': course})
+    return render(request, 'course/course_detail.html', {'course': course})

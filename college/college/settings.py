@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'users',
     'course',
+    'paypal.standard.ipn',
 ]
 
 MIDDLEWARE = [
@@ -81,6 +82,11 @@ DATABASES = {
     }
 }
 
+PAYPAL_RECEIVER_EMAIL = 'sb-n1470927897205@business.example.com'
+PAYPAL_TEST = True
+
+# PAYPAL_CLIENT_ID = 'AZFM2Kk42CNemJUmVDI7pUyMazS5YriN-5dqvGgiMacl8-yCXbjS1re7fI_1mMm0G5AOl2uyoB1U385R'
+# PAYPAL_SECRET = 'EL3SKaHdg-oIvIXOnhbBf7PSx8P4pwTkZOeMHAysMzca5mw-GBKGfStsOLngVQsXhYZdW5ak38Mkziu-'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -10,7 +10,7 @@ class CourseForm(ModelForm):
     
     class Meta:
         model = Course
-        fields = ['course_id', 'course_name', 'course_details', 'department', 'course_img', 'start_course', 'end_course']
+        fields = ['course_id', 'course_name', 'course_details', 'department', 'course_img', 'start_course', 'end_course', 'fees', 'html_input']
         widgets = {
             'start_course': DateInput(),
             'end_course': DateInput(),
