@@ -30,7 +30,14 @@ class SignupView(View):
             user.is_active = False
             user.save()
             
+            age = form.cleaned_data['age']
+            country = form.cleaned_data['country']
+            mobile_number = form.cleaned_data['mobile_number']
+            gender = form.cleaned_data['gender']
+            level_of_education = form.cleaned_data['level_of_education']
             
+            student = Student.objects.get_or_create(user=user, age=age, country=country, mobile_number=mobile_number, gender=gender, level_of_education=level_of_education)
+                        
             current_site = get_current_site(request)
             subject = 'Activate your account'
             message = render_to_string('users/account_activation_email.html', {
@@ -42,7 +49,6 @@ class SignupView(View):
             user.email_user(subject, message)
             
             return redirect('account_activation_sent')
-            # return redirect('home')
         return render(request, 'users/signup.html', {'form': form})
 
 @login_required
@@ -55,8 +61,6 @@ def activate(request, uidb64, token):
         user = User.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, Student.DoesNotExist, Exception):
         user = None
-        import pdb; pdb.set_trace()
-
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
