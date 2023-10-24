@@ -3,7 +3,7 @@
 <h1 class="text-center">Courses</h1>
 <div class="courses container">
     <div class="row">
-        {% for course in courses %}
+        {% for course in object_list %}
         <div class="card m-5" style="width: 18rem;">
                 <img src="{{ course.course_img.url }}" class="card-img-top" alt="">
                 <div class="card-body">

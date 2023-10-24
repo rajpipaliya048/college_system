@@ -13,7 +13,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from paypal.standard.forms import PayPalPaymentsForm
-
+from django.views.generic.list import ListView
 
 
 class CreateCourseView(View):
@@ -32,10 +32,8 @@ class CreateCourseView(View):
         else:
             return render(request, 'course/create_course.html', {'form': form })
 
-class CourseListView(View):
-    def get(self, request):
-        courses = Course.objects.all()
-        return render(request, 'course/course_list.html', {'courses': courses })
+class CourseListView(ListView):
+    model = Course
     
 class CourseEnrollView(View):
     
