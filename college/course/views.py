@@ -1,16 +1,20 @@
 import datetime
-import paypalrestsdk
 from .forms import CourseForm
 from .models import Course
 from .models import Course, Enrollment
+from decimal import Decimal
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic.detail import DetailView
+from django.views.decorators.csrf import csrf_exempt
+from paypal.standard.forms import PayPalPaymentsForm
+
+
 
 class CreateCourseView(View):
     def get(self, request):
@@ -33,67 +37,50 @@ class CourseListView(View):
         courses = Course.objects.all()
         return render(request, 'course/course_list.html', {'courses': courses })
     
-
-paypalrestsdk.configure({
-    "mode": "sandbox", 
-    "client_id": settings.PAYPAL_CLIENT_ID,
-    "client_secret": settings.PAYPAL_SECRET,
-})
 class CourseEnrollView(View):
     
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         student = self.request.user.student
+        user = self.request.user
         course_id = self.request.POST.get('course_id')
         student = self.request.user.student           
         current_date = datetime.date.today()
         course_id = self.request.POST.get('course_id')
         course = get_object_or_404(Course, course_id=course_id)
-        enrolled = Enrollment.objects.get_or_create(user_id=student, course_id=course, enrollment_date=current_date)
-        if enrolled:
+        enrolled = Enrollment.objects.get_or_create(user_id=student, course_id=course, enrollment_date=current_date,)
+
+        
+        if course.fees != 0:    
+            host = request.get_host()
+
+            paypal_dict = {
+                "business": settings.PAYPAL_RECEIVER_EMAIL,
+                "amount": course.fees,
+                "item_name": "name of the item",
+                "currency_code": "USD",
+                'notify_url': 'http://{}{}'.format(host,reverse('paypal-ipn')),
+                'return_url': 'http://{}{}'.format(host,reverse('course:payment_done')),
+                'cancel_return': 'http://{}{}'.format(host,reverse('course:payment_cancelled')),
+            }
+            form = PayPalPaymentsForm(initial=paypal_dict)
+            return render(request, 'course/process_payment.html', {'course': course, 'form': form})
+            
+        else:
             obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
             obj.isactive = True
             obj.save() 
-        
-        
-        payment = paypalrestsdk.Payment({
-        "intent": "sale",
-        "payer": {
-            "payment_method": "paypal",
-        },
-        "redirect_urls": {
-            "return_url": request.build_absolute_uri(reverse('course:execute_payment')),
-            "cancel_url": request.build_absolute_uri(reverse('home')),
-        },
-        "transactions": [
-            {
-                "amount": {
-                    "total": Course.objects.filter(course_id=course_id).values('fees'),
-                    "currency": "INR",
-                },
-                "description": "Payment for Product/Service",
-            }
-        ],
-        })
-        if payment.create():
-            return redirect(payment.links[1].href) 
-        else:
-            return render(request, 'payment_failed.html')
+        return redirect('dashboard')
 
-def execute_payment(request):
-    payment_id = request.GET.get('paymentId')
-    payer_id = request.GET.get('PayerID')
+@csrf_exempt
+def payment_done(request):
+    return render(request, 'course/payment_done.html')
 
-    payment = paypalrestsdk.Payment.find(payment_id)
 
-    if payment.execute({"payer_id": payer_id}):
-        return render(request, 'course/payment_success.html')
-    else:
-        return render(request, 'course/payment_failed.html')
+@csrf_exempt
+def payment_canceled(request):
+    return render(request, 'course/payment_cancelled.html')
 
-def payment_checkout(request):
-    return render(request, 'checkout.html')    
-    
 class CourseUnenrollView(View):
     def post(self, *args, **kwargs):
         course_id = self.request.POST.get('course_id')
