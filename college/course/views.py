@@ -34,7 +34,7 @@ class CreateCourseView(View):
 
 class CourseListView(ListView):
     model = Course
-    
+    paginate_by = 3
 class CourseEnrollView(View):
     
     @method_decorator(login_required)
