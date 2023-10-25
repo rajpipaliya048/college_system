@@ -92,3 +92,6 @@ class CourseUnenrollView(View):
 def course_detail_view(request, course_id):
     course = get_object_or_404(Course, course_id=course_id)
     return render(request, 'course/course_detail.html', {'course': course})
+
+
+        

@@ -2,6 +2,7 @@ from django import forms
 from .models import Student
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.forms import ModelForm
 import re
 from django.utils.translation import gettext_lazy as __
 from django.contrib.auth.forms import UserCreationForm
@@ -54,3 +55,27 @@ class StudentForm(UserCreationForm):
         fields = ('first_name','last_name', 'username', 'email', 'password1' ,'password2', 
                   'age', 'country', 'mobile_number', 'gender', 'level_of_education' )
     
+
+class UpdateProfileForm(ModelForm):
+    first_name = forms.CharField(max_length=50, min_length=3, validators=[validate_name])
+    last_name = forms.CharField(max_length=50, min_length=3, validators=[validate_name])
+    email = forms.EmailField()
+    age = forms.IntegerField(validators=[validate_age])
+    country = CountryField().formfield()
+    mobile_number = forms.CharField(max_length=10, min_length=10, validators=[validate_number])
+    gender_choice = (
+        ("male", "male"),
+        ("female", "female"),
+    )
+    gender = forms.ChoiceField(choices=gender_choice,)
+    education_choice = (
+        ('10th pass', '10th pass'),
+        ('12th pass', '12th pass'),
+        ('graduation', 'graduation'),
+        ('post_graduation', 'post graduation'),        
+    )
+    level_of_education = forms.ChoiceField(choices=education_choice, required=True)
+    
+    class Meta:
+        model = User
+        fields = ('first_name','last_name', 'email', 'age', 'country', 'mobile_number', 'gender', 'level_of_education' )

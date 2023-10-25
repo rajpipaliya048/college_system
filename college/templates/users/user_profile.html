@@ -14,6 +14,13 @@
         <div class="mb-4"><b>Gender: &nbsp;</b> {{ student.gender }}</div>
         <div class="mb-4"><b>Education: &nbsp;</b> {{ student.level_of_education }}</div>
 
+        <form class="form" action="/update_profile/" method="get">
+            {% csrf_token %}
+            <div class="text-start">
+                <input type = "submit" value = "Edit" class="btn btn-warning fw-bolder mt-5" />
+            </div>
+        </form>
+        
 </div>
 
 {% endblock %}
