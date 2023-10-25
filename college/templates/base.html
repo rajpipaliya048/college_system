@@ -21,7 +21,8 @@
                         {% if request.user.is_superuser %}
                         <a href="{% url 'course:create_course' %}" class="text-decoration-none fw-bolder me-4">Create Course</a>
                         {% endif %}
-                        <a href="{% url 'dashboard' %}" class="text-decoration-none fw-bolder">Dashboard</a>
+                        <a href="{% url 'dashboard' %}" class="text-decoration-none fw-bolder me-4">Dashboard</a>
+                        <a href="{% url 'profile' %}" class="text-decoration-none fw-bolder">Profile</a>
                     {% else %}
                     <a href="{% url 'login' %} " class="text-decoration-none fw-bolder me-4">Login</a>
                     <a href="{% url 'signup' %} " class="text-decoration-none fw-bolder">Signup</a>

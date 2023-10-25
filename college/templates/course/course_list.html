@@ -3,7 +3,7 @@
 <h1 class="text-center">Courses</h1>
 <div class="courses container">
     <div class="row">
-        {% for course in courses %}
+        {% for course in object_list %}
         <div class="card m-5" style="width: 18rem;">
                 <img src="{{ course.course_img.url }}" class="card-img-top" alt="">
                 <div class="card-body">
@@ -20,6 +20,24 @@
           </div>
         {% endfor %}
     </div>
-
 </div>
+
+<div class="pagination justify-content-center fw-bolder text-dark">
+  <span class="step-links">
+      {% if page_obj.has_previous %}
+          <a href="?page=1" class="text-decoration-none text-info">&laquo; first</a>
+          <a href="?page={{ page_obj.previous_page_number }}" class="text-decoration-none text-info ms-3">previous</a>
+      {% endif %}
+
+      <span class="current mx-3">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="text-decoration-none text-info me-3">next</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}" class="text-decoration-none text-info">last &raquo;</a>
+      {% endif %}
+  </span>
+</div>
+
 {% endblock%}

@@ -4,7 +4,7 @@
 {% block content %}
 <h1 class="text-center mt-5">Signup</h1>
 <div class="container">
-    <form action="/signup/" class="site-form" method="post">
+    <form action="/update_profile/" class="site-form" method="post">
         {% csrf_token %}
 
         <label for="{{ form.first_name.id_for_label }}" class="form-label">Firstname:</label>
@@ -15,21 +15,9 @@
         {{ form.last_name|add_class:"form-control" }}
         {{ form.errors.last_name }}
 
-        <label for="{{ form.username.id_for_label }}" class="form-label">Username:</label>
-        {{ form.username|add_class:"form-control" }}
-        {{ form.errors.username }}
-
         <label for="{{ form.email.id_for_label }}" class="form-label">Email:</label>
         {{ form.email|add_class:"form-control" }}
         {{ form.errors.email }}
-
-        <label for="{{ form.password1.id_for_label }}" class="form-label">Password:</label>
-        {{ form.password1|add_class:"form-control" }}
-        {{ form.errors.password1 }}
-
-        <label for="{{ form.password2.id_for_label }}" class="form-label">Confirm Password:</label>
-        {{ form.password2|add_class:"form-control" }}
-        {{ form.errors.password2 }}
 
         <label for="{{ form.age.id_for_label }}" class="form-label">Age:</label>
         {{ form.age|add_class:"form-control" }}
@@ -52,9 +40,8 @@
         {{ form.errors.level_of_education }}
 
 
-
         <div class="text-center">
-            <input type = "submit" value = "Register" class="btn btn-success fw-bolder mt-5" />
+            <input type = "submit" value = "Update" class="btn btn-success fw-bolder mt-5" />
         </div>
     </form>
 </div>

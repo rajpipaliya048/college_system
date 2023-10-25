@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1 class="text-center">Profile</h1>
+<div class="container ">
+        <div class="mb-4"><b>Username: &nbsp;</b> {{ student.user.username }}</div>
+        <div class="mb-4"><b>First name: &nbsp;</b> {{ student.user.first_name }}</div>
+        <div class="mb-4"><b>Last name: &nbsp;</b> {{ student.user.last_name }}</div>
+        <div class="mb-4"><b>Email: &nbsp;</b> {{ student.user.email }}</div>
+        <div class="mb-4"><b>Age: &nbsp;</b> {{ student.age }}</div>
+        <div class="mb-4"><b>Country: &nbsp;</b> {{ student.country }}</div>
+        <div class="mb-4"><b>Mobile number: &nbsp;</b> {{ student.mobile_number }}</div>
+        <div class="mb-4"><b>Gender: &nbsp;</b> {{ student.gender }}</div>
+        <div class="mb-4"><b>Education: &nbsp;</b> {{ student.level_of_education }}</div>
+
+        <form class="form" action="/update_profile/" method="get">
+            {% csrf_token %}
+            <div class="text-start">
+                <input type = "submit" value = "Edit" class="btn btn-warning fw-bolder mt-5" />
+            </div>
+        </form>
+        
+</div>
+
+{% endblock %}
