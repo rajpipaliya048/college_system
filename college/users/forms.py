@@ -55,11 +55,8 @@ class StudentForm(UserCreationForm):
         fields = ('first_name','last_name', 'username', 'email', 'password1' ,'password2', 
                   'age', 'country', 'mobile_number', 'gender', 'level_of_education' )
     
-
 class UpdateProfileForm(ModelForm):
-    first_name = forms.CharField(max_length=50, min_length=3, validators=[validate_name])
-    last_name = forms.CharField(max_length=50, min_length=3, validators=[validate_name])
-    email = forms.EmailField()
+    
     age = forms.IntegerField(validators=[validate_age])
     country = CountryField().formfield()
     mobile_number = forms.CharField(max_length=10, min_length=10, validators=[validate_number])
@@ -78,4 +75,4 @@ class UpdateProfileForm(ModelForm):
     
     class Meta:
         model = User
-        fields = ('first_name','last_name', 'email', 'age', 'country', 'mobile_number', 'gender', 'level_of_education' )
+        fields = ('age', 'country', 'mobile_number', 'gender', 'level_of_education' )
