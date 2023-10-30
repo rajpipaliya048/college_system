@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Make Payment{% endblock %}
+
+{% block content %}
+    <h4>Pay with cashfree</h4>
+    <form action="https://test.cashfree.com/pgappsdemos/v3success.php?myorder={{ response.payload.order_id }}" class="site-form" method="post">
+        {% csrf_token %}
+    <input type="submit" value="Pay With Cashfree" class="btn btn-success fw-bolder mt-5" >
+    </form>
+{% endblock %}
