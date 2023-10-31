@@ -14,7 +14,11 @@ SECRET_KEY = 'django-insecure-(advk8gos=zsx24gjac=dww%rmb4_-8=#z+ww4gle49m6tkf@#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.mycollege.com','course.mycollege.com', 'mycollege.com']
+ALLOWED_HOSTS = ['www.mycollege.com','course.mycollege.com', 'mycollege.com','1200-117-219-102-26.ngrok-free.app']
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://1200-117-219-102-26.ngrok-free.app'
+]
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_USE_TLS = True  
@@ -84,6 +88,13 @@ DATABASES = {
 
 PAYPAL_RECEIVER_EMAIL = 'sb-n1470927897205@business.example.com'
 PAYPAL_TEST = True
+
+CASHFREE_CLIENT_ID = "TEST1004636252a7a957fe37897b3e1426364001"
+CASHFREE_CLIENT_SECRET = "TEST42ddc01306b3dda05b1f5a1c147305b14be9811a"
+
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51O6YLUSBeOYLWagPZMg7d5G2hsazpZNUR1hLv7RB0Gz4MxLm7eqxG9ORK2CD6XC9NK9Il2GdOKMkY4PWkqW8vyTO00DtxsPBjj'
+STRIPE_SECRET_KEY = 'sk_test_51O6YLUSBeOYLWagPuwpvcM1ArdAVcyrTyGwokvIRuSDhlAfyUnjtbjnj5T2258PeqzXq3KBScyS6GfbdhDJekj5X00CI2pMtwS'
+
 
 # PAYPAL_CLIENT_ID = 'AZFM2Kk42CNemJUmVDI7pUyMazS5YriN-5dqvGgiMacl8-yCXbjS1re7fI_1mMm0G5AOl2uyoB1U385R'
 # PAYPAL_SECRET = 'EL3SKaHdg-oIvIXOnhbBf7PSx8P4pwTkZOeMHAysMzca5mw-GBKGfStsOLngVQsXhYZdW5ak38Mkziu-'

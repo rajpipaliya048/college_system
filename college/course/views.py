@@ -1,4 +1,5 @@
 import datetime
+import json
 from .forms import CourseForm
 from .models import Course
 from .models import Course, Enrollment
@@ -14,6 +15,9 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from paypal.standard.forms import PayPalPaymentsForm
 from django.views.generic.list import ListView
+import requests
+import stripe
+from django.http import HttpResponse, JsonResponse
 
 
 class CreateCourseView(View):
@@ -40,45 +44,68 @@ class CourseEnrollView(View):
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
         student = self.request.user.student
-        user = self.request.user
         course_id = self.request.POST.get('course_id')
         student = self.request.user.student           
         current_date = datetime.date.today()
-        course_id = self.request.POST.get('course_id')
         course = get_object_or_404(Course, course_id=course_id)
         enrolled = Enrollment.objects.get_or_create(user_id=student, course_id=course, enrollment_date=current_date,)
-
+        fees = course.fees * 100
         
         if course.fees != 0:    
-            host = request.get_host()
+            return render(request, 'course/payment_form.html', {'course_id': course.course_id, 'amount': fees}) 
+            # host = request.get_host()
 
-            paypal_dict = {
-                "business": settings.PAYPAL_RECEIVER_EMAIL,
-                "amount": course.fees,
-                "item_name": "name of the item",
-                "currency_code": "USD",
-                'notify_url': 'http://{}{}'.format(host,reverse('paypal-ipn')),
-                'return_url': 'http://{}{}'.format(host,reverse('course:payment_done')),
-                'cancel_return': 'http://{}{}'.format(host,reverse('course:payment_cancelled')),
-            }
-            form = PayPalPaymentsForm(initial=paypal_dict)
-            return render(request, 'course/process_payment.html', {'course': course, 'form': form})
+            # paypal_dict = {
+            #     "business": settings.PAYPAL_RECEIVER_EMAIL,
+            #     "amount": course.fees,
+            #     "item_name": "name of the item",
+            #     "currency_code": "USD",
+            #     'notify_url': 'http://{}{}'.format(host,reverse('paypal-ipn')),
+            #     'return_url': 'http://{}{}'.format(host,reverse('course:payment_done')),
+            #     'cancel_return': 'http://{}{}'.format(host,reverse('course:payment_cancelled')),
+            # }
+            # form = PayPalPaymentsForm(initial=paypal_dict)
+            # return render(request, 'course/process_payment.html', {'course': course, 'form': form})
             
         else:
             obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
             obj.isactive = True
             obj.save() 
+
+# @csrf_exempt
+# def payment_done(request):
+#     return render(request, 'course/payment_done.html')
+
+
+# @csrf_exempt
+# def payment_canceled(request):
+#     return render(request, 'course/payment_cancelled.html')
+
+class StripePaymentView(View):
+    def post(self, request):
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        course_id = self.request.POST.get('course_id')
+        course = get_object_or_404(Course, course_id=course_id)
+        amount = int(course.fees)
+        
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd',  
+                    'unit_amount': amount,
+                    'product_data': {
+                        'name': 'Course Payment',
+                        'description': 'Enroll in the course',
+                    },
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url= "https://1200-117-219-102-26.ngrok-free.app/dashboard", 
+        )
         return redirect('dashboard')
-
-@csrf_exempt
-def payment_done(request):
-    return render(request, 'course/payment_done.html')
-
-
-@csrf_exempt
-def payment_canceled(request):
-    return render(request, 'course/payment_cancelled.html')
-
+        
 class CourseUnenrollView(View):
     def post(self, *args, **kwargs):
         course_id = self.request.POST.get('course_id')
