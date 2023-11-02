@@ -1,5 +1,8 @@
 import datetime
 import json
+import razorpay
+import requests
+import stripe
 from .forms import CourseForm
 from .models import Course
 from .models import Course, Enrollment
@@ -7,18 +10,18 @@ from decimal import Decimal
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from paypal.standard.forms import PayPalPaymentsForm
 from django.views.generic.list import ListView
-import requests
-import stripe
-from django.http import HttpResponse, JsonResponse
+from paypal.standard.forms import PayPalPaymentsForm
 
+razorpay_client = razorpay.Client(
+    auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 class CreateCourseView(View):
     def get(self, request):
@@ -72,14 +75,14 @@ class CourseEnrollView(View):
             obj.isactive = True
             obj.save() 
 
-# @csrf_exempt
-# def payment_done(request):
-#     return render(request, 'course/payment_done.html')
+@csrf_exempt
+def payment_done(request):
+    return render(request, 'course/payment_done.html')
 
 
-# @csrf_exempt
-# def payment_canceled(request):
-#     return render(request, 'course/payment_cancelled.html')
+@csrf_exempt
+def payment_canceled(request):
+    return render(request, 'course/payment_cancelled.html')
 
 class StripePaymentView(View):
     def post(self, request):
@@ -105,7 +108,38 @@ class StripePaymentView(View):
             success_url= "https://1200-117-219-102-26.ngrok-free.app/dashboard", 
         )
         return redirect('dashboard')
+ 
+
+def initiate_payment(request):
+    if request.method == "POST":
+        amount = int(request.POST["amount"]) * 100
+
+        client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
+
+        payment_data = {
+            "amount": amount,
+            "currency": "INR",
+            "receipt": "order_receipt",
+            "notes": {
+                "email": "user_email@example.com",
+            },
+        }
+
+        order = client.order.create(data=payment_data)
         
+        response_data = {
+            "id": order["id"],
+            "amount": order["amount"],
+            "currency": order["currency"],
+            "key": settings.RAZORPAY_API_KEY,
+            "name": "college",
+            "description": "Payment for Your Product",
+        }
+        
+        return redirect('dashboard')
+    
+    return render(request, "payment.html")
+
 class CourseUnenrollView(View):
     def post(self, *args, **kwargs):
         course_id = self.request.POST.get('course_id')
