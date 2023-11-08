@@ -3,9 +3,32 @@
 {% block title %}Make Payment{% endblock %}
 
 {% block content %}
-    <h4>Pay with cashfree</h4>
-    <form action="https://test.cashfree.com/pgappsdemos/v3success.php?myorder={{ response.payload.order_id }}" class="site-form" method="post">
-        {% csrf_token %}
-    <input type="submit" value="Pay With Cashfree" class="btn btn-success fw-bolder mt-5" >
-    </form>
+<div class="container  ">
+    <input type="hidden" name="payment_session_id" value="{{ payment_session_id }}" id="paymentSessionId">
+    <input type="hidden" name="return_url" value="http://www.mycollege.com:8000/dashboard/" id="returnUrl">
+        <div class="col col-lg-4 col-sm-10 col-xs-12">
+            <div class="row">
+                <div class="col-12 bank col" bfor="qr">
+                    <button class="btn btn-block btn-full w-100 btn-primary" id="checkout">
+                        Confirm Payment
+                    </button>
+                </div>
+                 
+            </div>
+        </div>
+</div>
+<script>
+    const cash = Cashfree({ mode: "sandbox" });
+    const paymentMessage = document.getElementById("paymentMessage");
+    document.getElementById("checkout").addEventListener("click", function () {
+        cash.checkout({
+                paymentSessionId: document.getElementById("paymentSessionId").value,
+                returnUrl: document.getElementById("returnUrl").value,
+            })
+            .then(function () {
+                console.log("on going redirection");
+            });
+    });
+
+</script>
 {% endblock %}

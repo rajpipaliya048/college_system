@@ -13,7 +13,7 @@
     </script>
 </form>
  <!-- RAZORPAY INTEGRATION HERE -->
-  <form class="text-center border border-light p-5" actiom="{% url 'course:initiate_payment' %}" method="POST">
+  <form class="text-center border border-light p-5" actiom="{% url 'course:initiate_razorpay_payment' %}" method="POST">
     {% csrf_token %}
 
     <input type="hidden" name="amount" value="{{ amount }}">
@@ -32,5 +32,12 @@
     data-prefill.email="pc@studygyaan.com" 
     data-theme.color="#F37254"></script>
 
+</form>
+
+<form action="{% url 'course:initiate_payment'%}" method="POST">
+  {% csrf_token %}
+  <input type="hidden" name="course_id" value="{{ course_id }}">
+  <input type="hidden" name="order_id" value="{{ order_id }}">
+  <input type="submit" value="Pay with cashfree">
 </form>
   {% endblock%}
