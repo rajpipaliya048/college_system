@@ -1,21 +1,17 @@
 import datetime
-import json
+import random
 import razorpay
 import requests
 import stripe
-import hmac
-import hashlib
 import time
-import random
-from .forms import CourseForm
-from .models import Course
-from .models import Course, Enrollment
+from course.forms import CourseForm
+from course.models import Course, Enrollment
 from decimal import Decimal
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -29,11 +25,8 @@ razorpay_client = razorpay.Client(
 
 class CreateCourseView(View):
     def get(self, request):
-        if request.user.is_superuser:
-            form = CourseForm()
-            return render(request, 'course/create_course.html', {'form': form })
-        else:
-            return redirect('course:course_list')
+        form = CourseForm()
+        return render(request, 'course/create_course.html', {'form': form })
 
     def post(self, request):
         form = CourseForm(request.POST, request.FILES)
@@ -114,7 +107,7 @@ class StripePaymentView(View):
                 'quantity': 1,
             }],
             mode='payment',
-            success_url= "https://1200-117-219-102-26.ngrok-free.app/dashboard", 
+            success_url= "http://www.mycollege.com:8000/dashboard", 
         )
         return redirect('dashboard')
  
@@ -186,9 +179,7 @@ def initiate_cashfree_payment(request):
         data = response.json()
         payment_session_id = data['payment_session_id']
         order_id = data['order_id']
-        # import pdb; pdb.set_trace()
         return render(request, 'course/cashfree_payment.html', {'payment_session_id': payment_session_id, 'order_id': order_id })
-        # return redirect("https://sandbox.cashfree.com/pg/orders/%s"%order_id, {'data': data})
     else:
         return JsonResponse({'error': 'Failed to initiate payment'})
 
@@ -209,9 +200,6 @@ def course_detail_view(request, course_id):
 
 def generate_unique_order_id():
     timestamp = int(time.time() * 1000)
-
     random_number = random.randint(1000, 9999)
-
     order_id = f"{timestamp}{random_number}"
-
     return order_id

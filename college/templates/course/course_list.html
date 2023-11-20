@@ -5,7 +5,11 @@
     <div class="row">
         {% for course in object_list %}
         <div class="card m-5" style="width: 18rem;">
+                {% if course.course_img %}
                 <img src="{{ course.course_img.url }}" class="card-img-top" alt="">
+                {% else %}
+                <img alt="course image" src="/college/media/course-images/download.jpeg">
+                {% endif %}
                 <div class="card-body">
                   <h5 class="card-title">{{ course.course_name }}</h5>
                   <p class="card-text">{{ course.snippet }}</p>

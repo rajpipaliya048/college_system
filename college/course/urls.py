@@ -1,6 +1,6 @@
 import re
-from . import views
-from .views import CreateCourseView, CourseListView, CourseEnrollView, CourseUnenrollView, StripePaymentView
+from course import views
+from course.views import CreateCourseView, CourseListView, CourseEnrollView, CourseUnenrollView, StripePaymentView
 from django.urls import path, re_path
 
 app_name = 'course'

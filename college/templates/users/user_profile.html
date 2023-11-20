@@ -13,6 +13,7 @@
         <div class="mb-4"><b>Mobile number: &nbsp;</b> {{ student.mobile_number }}</div>
         <div class="mb-4"><b>Gender: &nbsp;</b> {{ student.gender }}</div>
         <div class="mb-4"><b>Education: &nbsp;</b> {{ student.level_of_education }}</div>
+        <div class="mb-4"><b>Skills: &nbsp;</b> {{ student.skills }}</div>
 
         <form class="form" action="/update_profile/" method="get">
             {% csrf_token %}

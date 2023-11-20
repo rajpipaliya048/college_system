@@ -51,7 +51,9 @@
         {{ form.level_of_education|add_class:"form-select" }}  
         {{ form.errors.level_of_education }}
 
-
+        <label for="{{ form.skills.id_for_label }}" class="form-label">Skills:</label>
+        {{ form.skills|add_class:"form-control" }}  
+        {{ form.errors.skills }}
 
         <div class="text-center">
             <input type = "submit" value = "Register" class="btn btn-success fw-bolder mt-5" />
