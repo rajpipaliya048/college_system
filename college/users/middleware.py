@@ -22,7 +22,7 @@ class AdminAccessOnlyMiddleware(MiddlewareMixin):
 class AddSkillsMiddleware(MiddlewareMixin):
     
     def process_request(self, request):
-        if request.user.is_authenticated and not request.path == '/update-skills/':
+        if request.user.is_authenticated and not request.path == '/update-skills/' and not request.path.startswith('/admin/'):
             student = request.user.student
             skills = student.skills
             if not skills:
