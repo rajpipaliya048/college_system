@@ -1,0 +1,55 @@
+// craete user 	
+
+import random
+from django.contrib.auth.models import User
+from users.models import Student
+from django.utils.crypto import get_random_string
+def generate_random_user():
+    age = random.randint(18, 25)
+    country = 'US' 
+    mobile_number = random.randint(1000000000, 9999999999)
+    gender = random.choice([Student.male, Student.female])
+    education_level = random.choice([Student.ssc, Student.hsc, Student.graduation, Student.post_graduation])
+    username = get_random_string(length=10)
+    email = f"{username}@example.com"
+    return {'age': age, 'country': country,'mobile_number': mobile_number,'gender': gender,'education_level': education_level,'username': username,'email': email,}
+def create_users(num_users):
+    for _ in range(num_users):
+        user_data = generate_random_user()
+        user = User.objects.create_user(username=user_data['username'],email=user_data['email'],password=get_random_string(length=12),)
+        student = Student.objects.create(user=user,age=user_data['age'],country=user_data['country'],mobile_number=user_data['mobile_number'],gender=user_data['gender'],level_of_education=user_data['education_level'],)
+num_users_to_create = 500
+create_users(num_users_to_create)
+print(f"{num_users_to_create} users created successfully.")
+
+
+
+// to create course
+
+import random
+from faker import Faker
+from django.utils.text import slugify
+from course.models import Department, Course
+from django.utils.crypto import get_random_string
+from datetime import datetime, timedelta
+fake = Faker()
+def generate_course_id():
+    return f"{random.randint(10, 99)}{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}{random.randint(10, 99)}"
+
+def generate_course_details():
+    return fake.paragraph(nb_sentences=5)
+
+def create_courses(num_courses):
+    departments = Department.objects.all()
+    for _ in range(num_courses):
+        course_id = generate_course_id()
+        course_name = fake.job()
+        course_details = generate_course_details()
+        department = random.choice(departments)
+        start_course = fake.date_between_dates(date_start=datetime.now(), date_end=datetime.now() + timedelta(days=365))
+        end_course = fake.date_between_dates(date_start=start_course, date_end=start_course + timedelta(days=365))
+        fees = random.randint(1000, 10000)
+        Course.objects.create(course_id=course_id,course_name=course_name,course_details=course_details,department=department,start_course=start_course,end_course=end_course,fees=fees)
+
+create_courses(1000)
+print("1000 courses created successfully.")
