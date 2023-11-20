@@ -38,7 +38,15 @@ class SignupView(View):
             mobile_number = form.cleaned_data['mobile_number']
             gender = form.cleaned_data['gender']
             level_of_education = form.cleaned_data['level_of_education']
-            student = Student.objects.get_or_create(user=user, age=age, country=country, mobile_number=mobile_number, gender=gender, level_of_education=level_of_education)
+            skills = form.cleaned_data['skills']
+            student = Student.objects.get_or_create(user=user, 
+                                                    age=age, 
+                                                    country=country, 
+                                                    mobile_number=mobile_number, 
+                                                    gender=gender, 
+                                                    level_of_education=level_of_education, 
+                                                    skills=skills
+                                                    )
                         
             current_site = get_current_site(request)
             subject = 'Activate your account'
@@ -86,9 +94,21 @@ class LoginView(View):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
+            skills = user.student.skills
             login(request, user)
-            return redirect('home')
+            if not skills:
+                return redirect('update_skills')
+            else:
+                return redirect('home')
         return render(request, 'users/login.html', {'form': form})
+    
+def update_skills(request):
+    if request.method == 'POST':
+        student = request.user.student
+        student.skills = request.POST.get('skills')
+        student.save()
+        return redirect('dashboard')
+    return render(request, 'users/update_skills.html')
 
 class LogoutView(View):
     def get(self, request):
@@ -159,8 +179,6 @@ class EditProfileView(UpdateView):
         return self.request.user.student
     
     success_url ="/profile"
-
-    
     
 @login_required
 def email_update_sent(request):

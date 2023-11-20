@@ -24,6 +24,16 @@ class Student(models.Model):
                         (post_graduation, 'post_graduation'),
                         ]
     level_of_education = models.CharField(max_length=20, choices=education_choice,)
+    skills = models.TextField(null=True)
     
+    def __str__(self):
+        return self.user.username
+    
+class RequestLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    url = models.CharField(max_length=255)
+    method = models.CharField(max_length=10)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return self.user.username

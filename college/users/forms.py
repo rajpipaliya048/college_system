@@ -49,11 +49,11 @@ class StudentForm(UserCreationForm):
         ('post_graduation', 'post graduation'),        
     )
     level_of_education = forms.ChoiceField(choices=education_choice, required=True)
-    
+    skills = forms.CharField(max_length=500)
     class Meta:
         model = User
         fields = ('first_name','last_name', 'username', 'email', 'password1' ,'password2', 
-                  'age', 'country', 'mobile_number', 'gender', 'level_of_education' )
+                  'age', 'country', 'mobile_number', 'gender', 'level_of_education' , 'skills')
     
 class UpdateProfileForm(ModelForm):
     
@@ -72,7 +72,7 @@ class UpdateProfileForm(ModelForm):
         ('post_graduation', 'post graduation'),        
     )
     level_of_education = forms.ChoiceField(choices=education_choice, required=True)
-    
+    skills = forms.CharField(max_length=500)
     class Meta:
-        model = User
-        fields = ('age', 'country', 'mobile_number', 'gender', 'level_of_education' )
+        model = Student
+        fields = ('age', 'country', 'mobile_number', 'gender', 'level_of_education', 'skills' )

@@ -3,7 +3,11 @@
 {% block content %}
 <div class="course-detail container">
     <div class="course">
-        <img src="{{ course.course_img.url }}" alt="{{ course.course_name }}">
+        {% if course.course_img %}
+        <img src="{{ course.course_img.url }}" class="card-img-top" alt="">
+        {% else %}
+        <img alt="course image" src="/college/media/course-images/download.jpeg">
+        {% endif %}
         <h5>{{ course.course_name }}</h5>
         <p>{{ course.course_details }}</p>
         <p><span>Department: </span>{{ course.department }}</p>

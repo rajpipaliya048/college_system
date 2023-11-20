@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Update Your Skills</h2>
+  <form method="post" action="{% url 'update_skills' %}">
+    {% csrf_token %}
+    <label for="skills" class="form-label">Skills:</label>
+    <input type="text" name="skills" required class="form-control">
+    <button type="submit" class="btn btn-success fw-bolder mt-5">Update Skills</button>
+  </form>
+{% endblock %}

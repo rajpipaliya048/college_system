@@ -53,6 +53,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.RequestLoggingMiddleware',
+    'users.middleware.AdminAccessOnlyMiddleware',
 ]
 
 ROOT_URLCONF = 'college.urls'
@@ -90,14 +92,14 @@ PAYPAL_RECEIVER_EMAIL = 'sb-n1470927897205@business.example.com'
 PAYPAL_TEST = True
 
 CASHFREE_CLIENT_ID = "TEST1004636252a7a957fe37897b3e1426364001"
-CASHFREE_CLIENT_SECRET = "TEST42ddc01306b3dda05b1f5a1c147305b14be9811a"
+CASHFREE_CLIENT_SECRET = "TESTda62d9e12f45596682807043257c2cab9ea9c1bd"
 
 STRIPE_PUBLISHABLE_KEY = 'pk_test_51O6YLUSBeOYLWagPZMg7d5G2hsazpZNUR1hLv7RB0Gz4MxLm7eqxG9ORK2CD6XC9NK9Il2GdOKMkY4PWkqW8vyTO00DtxsPBjj'
 STRIPE_SECRET_KEY = 'sk_test_51O6YLUSBeOYLWagPuwpvcM1ArdAVcyrTyGwokvIRuSDhlAfyUnjtbjnj5T2258PeqzXq3KBScyS6GfbdhDJekj5X00CI2pMtwS'
 
 
-# PAYPAL_CLIENT_ID = 'AZFM2Kk42CNemJUmVDI7pUyMazS5YriN-5dqvGgiMacl8-yCXbjS1re7fI_1mMm0G5AOl2uyoB1U385R'
-# PAYPAL_SECRET = 'EL3SKaHdg-oIvIXOnhbBf7PSx8P4pwTkZOeMHAysMzca5mw-GBKGfStsOLngVQsXhYZdW5ak38Mkziu-'
+RAZORPAY_KEY_ID = 'rzp_test_cbbT64IJEOxbfw'
+RAZORPAY_KEY_SECRET = 'DewJLZJWfFLLnBJx4o0hv2Vr'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -148,3 +150,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
