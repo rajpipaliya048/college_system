@@ -55,6 +55,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'users.middleware.RequestLoggingMiddleware',
     'users.middleware.AdminAccessOnlyMiddleware',
+    'users.middleware.AddSkillsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'college.urls'
