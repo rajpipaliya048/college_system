@@ -94,12 +94,8 @@ class LoginView(View):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            skills = user.student.skills
             login(request, user)
-            if not skills:
-                return redirect('update_skills')
-            else:
-                return redirect('home')
+            return redirect('home')
         return render(request, 'users/login.html', {'form': form})
     
 def update_skills(request):

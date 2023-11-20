@@ -1,6 +1,8 @@
-from users.models import RequestLog
 from django.http import HttpResponseForbidden
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils.deprecation import MiddlewareMixin
+from users.models import RequestLog
 
 
 class RequestLoggingMiddleware(MiddlewareMixin):
@@ -16,3 +18,12 @@ class AdminAccessOnlyMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if request.path == '/course/create/' and not request.user.is_staff:
             return HttpResponseForbidden("Accessible for admins only")
+        
+class AddSkillsMiddleware(MiddlewareMixin):
+    
+    def process_request(self, request):
+        if request.user.is_authenticated and not request.path == '/update-skills/':
+            student = request.user.student
+            skills = student.skills
+            if not skills:
+                return render(request, 'users/update_skills.html')
