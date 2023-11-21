@@ -26,6 +26,8 @@ urlpatterns = [
     path('update/<uidb64>/<token>/', userviews.update, name='update'),
     path('email_updated/', userviews.email_updated, name='email_updated'),
     path('update-skills/', userviews.update_skills, name='update_skills'),
+    path('update-users-from-csv/', userviews.update_users_from_csv, name='update_users_from_csv'),
+    path('send-email/', userviews.send_email, name='send_email'),
 ]
 
 
