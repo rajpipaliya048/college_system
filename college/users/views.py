@@ -1,5 +1,7 @@
+import csv
 from .forms import StudentForm, UpdateProfileForm
 from .models import Student
+from course.models import Enrollment
 from .tokens import account_activation_token
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -8,14 +10,17 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import UpdateView
+from users.tasks import update_user_details_from_csv, send_email_to_users
 
 
 
@@ -197,3 +202,29 @@ def update(request, uidb64, token):
 @login_required
 def email_updated(request):
     return render(request, 'users/email_updated.html')
+
+@csrf_exempt
+def update_users_from_csv(request):
+    if request.method == 'GET':
+        return render(request, 'users/update_user_from_csv.html')
+    
+    if request.method == 'POST':
+        csv_file = request.FILES["csv_input"]
+        if not csv_file.name.endswith('.csv'):
+            return HttpResponseRedirect(reverse("update_users_from_csv"))
+        file_data = csv_file.read().decode("utf-8")
+        print(file_data)
+        update_user_details_from_csv.delay(file_data)
+        return redirect('/')
+
+@csrf_exempt
+def send_email(request):
+    if request.method == 'POST':
+        message = request.POST['message']
+        subject = request.POST['subject']
+        enrollments = Enrollment.objects.all()
+        enrolled_users_emails = [enrollment.user_id.user.email for enrollment in enrollments]
+        for user in enrolled_users_emails:
+            send_email_to_users(user, subject, message)
+        return redirect('/')
+    return render(request, 'users/send_mass_mail.html')
