@@ -20,14 +20,17 @@ CSRF_TRUSTED_ORIGINS = [
     'https://1200-117-219-102-26.ngrok-free.app'
 ]
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_USE_TLS = True  
-EMAIL_HOST = 'smtp.gmail.com'  
-EMAIL_HOST_USER = 'rajpatelfordjango@gmail.com'  
-EMAIL_HOST_PASSWORD = 'R@j123456'  
-EMAIL_PORT = 587  
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# EMAIL_USE_TLS = True  
+# EMAIL_HOST = 'smtp.gmail.com'  
+# EMAIL_HOST_USER = 'rajpatelfordjango@gmail.com'  
+# EMAIL_HOST_PASSWORD = 'R@j123456'  
+# EMAIL_PORT = 587  
 
-
+EMAIL_HOST = '127.0.0.1'
+EMAIL_PORT = 1025
+EMAIL_USE_TLS = False
+    
 LOGIN_URL = '/login/' 
 
 # Application definition
@@ -155,3 +158,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_TASK_TRACK_STARTED = True
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "example"
+    }
+}
