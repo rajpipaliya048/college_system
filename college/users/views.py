@@ -225,6 +225,6 @@ def send_email(request):
         enrollments = Enrollment.objects.all()
         enrolled_users_emails = [enrollment.user_id.user.email for enrollment in enrollments]
         for user in enrolled_users_emails:
-            send_email_to_users(user, subject, message)
+            send_email_to_users.delay(user, subject, message)
         return redirect('/')
     return render(request, 'users/send_mass_mail.html')
