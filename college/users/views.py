@@ -1,4 +1,5 @@
 import csv
+from io import StringIO
 from .forms import StudentForm, UpdateProfileForm
 from .models import Student
 from course.models import Enrollment
@@ -21,6 +22,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import UpdateView
 from users.tasks import update_user_details_from_csv, send_email_to_users
+from course.models import Course
 
 
 
@@ -213,7 +215,6 @@ def update_users_from_csv(request):
         if not csv_file.name.endswith('.csv'):
             return HttpResponseRedirect(reverse("update_users_from_csv"))
         file_data = csv_file.read().decode("utf-8")
-        print(file_data)
         update_user_details_from_csv.delay(file_data)
         return redirect('/')
 
@@ -227,4 +228,7 @@ def send_email(request):
         for user in enrolled_users_emails:
             send_email_to_users.delay(user, subject, message)
         return redirect('/')
-    return render(request, 'users/send_mass_mail.html')
+    if request.method == 'GET':
+        courses = Course.objects.all()
+        course_ids = [course.course_id for course in courses]
+        return render(request, 'users/send_mass_mail.html', {'course_ids': course_ids})
