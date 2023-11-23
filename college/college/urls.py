@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from users.views import SignupView, LoginView, LogoutView, EditProfileView
+from users.views import Actions, SignupView, LoginView, LogoutView, EditProfileView, SendEmail, UpdateUserFromCsv, CsvReport
 from django.conf.urls.static import static
 from django.conf import settings
 from . import views
@@ -26,8 +26,12 @@ urlpatterns = [
     path('update/<uidb64>/<token>/', userviews.update, name='update'),
     path('email_updated/', userviews.email_updated, name='email_updated'),
     path('update-skills/', userviews.update_skills, name='update_skills'),
-    path('update-users-from-csv/', userviews.update_users_from_csv, name='update_users_from_csv'),
-    path('send-email/', userviews.send_email, name='send_email'),
+    path('update-users-from-csv/', UpdateUserFromCsv.as_view(), name='update_users_from_csv'),
+    path('send-email/', SendEmail.as_view(), name='send_email'),
+    path('csv-report/', CsvReport.as_view(), name='csv_report'),
+    path('actions/', Actions.as_view(), name='actions'),
+
+
 ]
 
 

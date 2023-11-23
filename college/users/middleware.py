@@ -1,6 +1,5 @@
 from django.http import HttpResponseForbidden
-from django.shortcuts import redirect, render
-from django.urls import reverse
+from django.shortcuts import render
 from django.utils.deprecation import MiddlewareMixin
 from users.models import RequestLog
 
@@ -22,7 +21,7 @@ class AdminAccessOnlyMiddleware(MiddlewareMixin):
 class AddSkillsMiddleware(MiddlewareMixin):
     
     def process_request(self, request):
-        if request.user.is_authenticated and not request.path == '/update-skills/' and not request.path.startswith('/admin/'):
+        if request.user.is_authenticated and not request.user.is_superuser and not request.path == '/update-skills/' and not request.path.startswith('/admin/'):
             student = request.user.student
             skills = student.skills
             if not skills:

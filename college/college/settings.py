@@ -59,8 +59,49 @@ MIDDLEWARE = [
     'users.middleware.RequestLoggingMiddleware',
     'users.middleware.AdminAccessOnlyMiddleware',
     'users.middleware.AddSkillsMiddleware',
-
 ]
+
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 600
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "example"
+    }
+}
+
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime}  {process:d}  {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'newfile': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '../debug.log',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        '': {
+            'level': 'DEBUG',
+            'handlers': ['newfile'],
+            'propagate': False,
+        },
+    },
+}
 
 ROOT_URLCONF = 'college.urls'
 
@@ -163,13 +204,3 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_RESULT_BACKEND = "redis://localhost:6379"
 CELERY_TASK_TRACK_STARTED = True
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient"
-        },
-        "KEY_PREFIX": "example"
-    }
-}

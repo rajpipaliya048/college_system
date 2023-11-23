@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container text-center">
+    <a href="{% url 'send_email' %}" class="text-decoration-none fw-bolder me-4">Send Emails</a>
+    <a href="{% url 'update_users_from_csv' %}" class="text-decoration-none fw-bolder me-4">Update users from csv</a>
+    <a href="{% url 'csv_report' %}" download="enrollment_report.csv" class="text-decoration-none fw-bolder me-4">Generate csv about enrollments</a>
+    <a href="{% url 'course:create_course' %}" class="text-decoration-none fw-bolder me-4">Create Course</a>
+</div>
+
+{% endblock %}

@@ -30,7 +30,7 @@ class Course(models.Model):
     html_input = models.TextField(null=True)
     
     def __str__(self):
-        return self.course_name
+        return self.course_id
     
     
     def snippet(self):

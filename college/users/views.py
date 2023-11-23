@@ -1,17 +1,14 @@
-import csv
-from io import StringIO
-from .forms import StudentForm, UpdateProfileForm
-from .models import Student
+import logging
+import os
+from course.models import Course
 from course.models import Enrollment
-from .tokens import account_activation_token
+from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, FileResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -19,12 +16,16 @@ from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import UpdateView
-from users.tasks import update_user_details_from_csv, send_email_to_users
-from course.models import Course
+from users.decorators import superuser_required
+from users.forms import StudentForm, UpdateProfileForm
+from users.models import Student
+from users.tasks import update_user_details_from_csv, send_email_to_users, generate_csv_report
+from users.tokens import account_activation_token
+from django.core.cache import cache
 
 
+logger = logging.getLogger(__name__)
 
 class SignupView(View):
     
@@ -90,7 +91,7 @@ def activate(request, uidb64, token):
 def account_activation_complete(request):
     return render(request, 'users/account_activation_complete.html')
 class LoginView(View):
-    
+
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('home')
@@ -116,7 +117,7 @@ def update_skills(request):
 class LogoutView(View):
     def get(self, request):
         logout(request)
-        return redirect('login')
+        return redirect('/')
 
 @login_required
 def user_profile(request):
@@ -205,30 +206,56 @@ def update(request, uidb64, token):
 def email_updated(request):
     return render(request, 'users/email_updated.html')
 
-@csrf_exempt
-def update_users_from_csv(request):
-    if request.method == 'GET':
+
+@method_decorator(superuser_required, name='dispatch')
+class UpdateUserFromCsv(View):
+    def get(self, request):
         return render(request, 'users/update_user_from_csv.html')
+
     
-    if request.method == 'POST':
+    def post(self, request):
         csv_file = request.FILES["csv_input"]
         if not csv_file.name.endswith('.csv'):
             return HttpResponseRedirect(reverse("update_users_from_csv"))
         file_data = csv_file.read().decode("utf-8")
         update_user_details_from_csv.delay(file_data)
         return redirect('/')
-
-@csrf_exempt
-def send_email(request):
-    if request.method == 'POST':
-        message = request.POST['message']
-        subject = request.POST['subject']
-        enrollments = Enrollment.objects.all()
-        enrolled_users_emails = [enrollment.user_id.user.email for enrollment in enrollments]
-        for user in enrolled_users_emails:
-            send_email_to_users.delay(user, subject, message)
-        return redirect('/')
-    if request.method == 'GET':
+    
+   
+@method_decorator(superuser_required, name='dispatch')
+class SendEmail(View):
+    
+    def get(self, request):
         courses = Course.objects.all()
         course_ids = [course.course_id for course in courses]
         return render(request, 'users/send_mass_mail.html', {'course_ids': course_ids})
+    
+    def post(self, request):
+        message = request.POST.get('message', 'Default message')
+        subject = request.POST.get('subject', 'Default subject')
+        course_list = request.POST.get('course_list')
+        course = course_list.split(',')
+        logger.info("Sending Email started") 
+        enrolled_users_emails = []
+        for course_id in course:
+            enrollments = Enrollment.objects.filter(course_id=course_id)
+            for enrollment in enrollments:
+                enrolled_users_emails.append(enrollment.user_id.user.email)
+        send_email_to_users.delay(enrolled_users_emails, subject, message)
+        return redirect('/')
+    
+
+@method_decorator(superuser_required, name='dispatch')
+class CsvReport(View):
+    def get(self, request):
+        data = cache.get('report')
+        if not data:
+            generate_csv_report.delay()
+        file = os.path.join(settings.BASE_DIR, 'report/enrollment_report.csv')
+        fileopened = open(file, 'rb')
+        return fileopened
+    
+@method_decorator(superuser_required, name='dispatch')
+class Actions(View):
+    def get(self, request):
+        return render(request, 'actions.html')
