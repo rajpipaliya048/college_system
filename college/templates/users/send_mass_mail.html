@@ -3,23 +3,26 @@
 {% block content %}
 
 <div class="container">
-    <h1 class="text-center">Send email</h1>
+    <h1 class="text-center fw-light my-5">Send email</h1>
 
     <form class="form" action="{% url 'send_email' %}" method="post">
         {% csrf_token %}
         <input type="hidden" name="course_list" value="" id="course_list">
 
         <div class="mb-3">
-            <label for="subject" class="form-label">Enter subject:</label>
+            <label for="subject" class="form-label mb-3 lead">Enter subject:</label>
             <input class="form-control" type="text" id="subject" name="subject">
         </div>
 
         <div class="mb-3">
-            <label for="message" class="form-label">Enter Message:</label>
-            <input class="form-control" type="text" id="message" name="message">
+            <label for="mytextarea" class="form-label mt-4 mb-3 lead">Enter Message:</label>
+            <div>
+                <textarea id="mytextarea" name="mytextarea" class="form-control"></textarea>
+                <input type="hidden" name="message" id="message" value="">
+            </div>
         </div>
         <div class="dropdown"> 
-            <input class="btn btn-success dropdown-toggle" type="button" id="multiSelectDropdown" data-bs-toggle="dropdown" aria-expanded="false" value="select courses">
+            <input class="btn btn-outline-secondary cl-btn mt-4 dropdown-toggle" type="button" id="multiSelectDropdown" data-bs-toggle="dropdown" aria-expanded="false" value="select courses">
             <ul class="dropdown-menu" aria-labelledby="multiSelectDropdown"> 
                 <li>
                     <label> 
@@ -40,7 +43,7 @@
         </div> 
     </div>
         <div class="text-center">
-            <input type="submit" value="send" id="Send" class="btn btn-success fw-bolder mt-5" />
+            <input type="submit" value="send" id="Send" class="btn btn-outline-secondary cl-form-btn mt-4" />
         </div>
 
     </form>

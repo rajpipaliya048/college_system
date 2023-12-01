@@ -40,7 +40,6 @@ function handleCB(event) {
     courselist.value = mySelectedItems;
 }
 
-// confirmation of sending mail
 dropdownMenu.addEventListener('click', handleCB);
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -53,3 +52,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+let textarea = document.getElementById('mytextarea')
+let messagebox = document.getElementById('message')
+
+function for_email_message() {
+    var message = textarea.value;
+    messagebox.value = message;
+}
+
+textarea.addEventListener('keyup', for_email_message)

@@ -20,16 +20,16 @@ CSRF_TRUSTED_ORIGINS = [
     'https://1200-117-219-102-26.ngrok-free.app'
 ]
 
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-# EMAIL_USE_TLS = True  
-# EMAIL_HOST = 'smtp.gmail.com'  
-# EMAIL_HOST_USER = 'rajpatelfordjango@gmail.com'  
-# EMAIL_HOST_PASSWORD = 'R@j123456'  
-# EMAIL_PORT = 587  
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_USE_TLS = True  
+EMAIL_HOST = 'smtp.gmail.com'  
+EMAIL_HOST_USER = 'rajpatelfordjango@gmail.com'  
+EMAIL_HOST_PASSWORD = 'R@j123456'  
+EMAIL_PORT = 587  
 
-EMAIL_HOST = '127.0.0.1'
-EMAIL_PORT = 1025
-EMAIL_USE_TLS = False
+# EMAIL_HOST = '127.0.0.1'
+# EMAIL_PORT = 1025
+# EMAIL_USE_TLS = False
     
 LOGIN_URL = '/login/' 
 
@@ -58,7 +58,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'users.middleware.RequestLoggingMiddleware',
     'users.middleware.AdminAccessOnlyMiddleware',
-    'users.middleware.AddSkillsMiddleware',
+    # 'users.middleware.AddSkillsMiddleware',
 ]
 
 CACHE_MIDDLEWARE_ALIAS = 'default'

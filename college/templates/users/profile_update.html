@@ -2,40 +2,43 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<h1 class="text-center mt-5">Edit profile</h1>
-<div class="container">
+
+<div class="w-25 mx-auto">
+    <h1 class="text-center fw-light my-5">Edit Profile</h1>
     <form action="/update_profile/" class="site-form" method="post">
         {% csrf_token %}
 
-        <label for="{{ form.age.id_for_label }}" class="form-label">Age:</label>
+        <label for="{{ form.age.id_for_label }}" class="form-label mb-3 lead">Age:</label>
         {{ form.age|add_class:"form-control" }}
         {{ form.errors.age }}
 
-        <label for="{{ form.country.id_for_label }}" class="form-label">Country/Region:</label>
+        <label for="{{ form.country.id_for_label }}" class="form-label mt-4 mb-3 lead">Country/Region:</label>
         {{ form.country|add_class:"form-select" }}  
         {{ form.errors.country }}
 
-        <label for="{{ form.mobile_number.id_for_label }}" class="form-label">Mobile number:</label>
+        <label for="{{ form.mobile_number.id_for_label }}" class="form-label mt-4 mb-3 lead">Mobile number:</label>
         {{ form.mobile_number|add_class:"form-control" }}  
         {{ form.errors.mobile_number }}
 
-        <label for="{{ form.gender.id_for_label }}" class="form-label">Sex:</label>
+        <label for="{{ form.gender.id_for_label }}" class="form-label mt-4 mb-3 lead">Sex:</label>
         {{ form.gender|add_class:"form-select" }}  
         {{ form.errors.gender }}
 
-        <label for="{{ form.level_of_education.id_for_label }}" class="form-label">Education:</label>
+        <label for="{{ form.level_of_education.id_for_label }}" class="form-label mt-4 mb-3 lead">Education:</label>
         {{ form.level_of_education|add_class:"form-select" }}  
         {{ form.errors.level_of_education }}
 
-        <label for="{{ form.skills.id_for_label }}" class="form-label">Skills:</label>
+        <label for="{{ form.skills.id_for_label }}" class="form-label mt-4 mb-3 lead">Skills:</label>
         {{ form.skills|add_class:"form-control" }}  
         {{ form.errors.skills }}
 
         <div class="text-center">
-            <input type = "submit" value = "Update" class="btn btn-success fw-bolder mt-5" id="profile_update"/>
+            <input type = "submit" value = "Update" class="btn btn-outline-secondary cl-form-btn mt-4" id="profile_update"/>
         </div>
     </form>
 </div>
+
+
 
 
 {% endblock %}

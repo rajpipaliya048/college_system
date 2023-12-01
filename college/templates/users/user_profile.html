@@ -1,27 +1,34 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="container">
+    <h1 class="text-center fw-light mt-3 mb-5">Profile</h1>
 
-<h1 class="text-center">Profile</h1>
-<div class="container ">
-        <div class="mb-4"><b>Username: &nbsp;</b> {{ student.user.username }}</div>
-        <div class="mb-4"><b>First name: &nbsp;</b> {{ student.user.first_name }}</div>
-        <div class="mb-4"><b>Last name: &nbsp;</b> {{ student.user.last_name }}</div>
-        <div class="mb-4"><b>Email: &nbsp;</b> {{ student.user.email }}</div>
-        <div class="mb-4"><b>Age: &nbsp;</b> {{ student.age }}</div>
-        <div class="mb-4"><b>Country: &nbsp;</b> {{ student.country }}</div>
-        <div class="mb-4"><b>Mobile number: &nbsp;</b> {{ student.mobile_number }}</div>
-        <div class="mb-4"><b>Gender: &nbsp;</b> {{ student.gender }}</div>
-        <div class="mb-4"><b>Education: &nbsp;</b> {{ student.level_of_education }}</div>
-        <div class="mb-4"><b>Skills: &nbsp;</b> {{ student.skills }}</div>
-
+        <div class="row">
+            <div class="col-6">
+                <p class="pb-3 lead"><span class="fw-bold me-2">Username: </span>{{ user.username }}</p>
+                <p class="pb-3 lead"><span class="fw-bold me-2">First name: </span>{{ user.first_name }}</p>
+                <p class="pb-3 lead"><span class="fw-bold me-2">Last name: </span>{{ user.last_name }}</p>
+                <p class="pb-3 lead"><span class="fw-bold me-2">Email: </span>{{ user.email }}</p>
+                <p class="pb-3 lead"><span class="fw-bold me-2">Age: </span>{{ user.student.age }}</p>
+            </div>
+            <div class="col-6">
+                <p class="pb-3 lead"><span class="fw-bold me-2">Country: </span>{{ user.student.country }}</p>
+                <p class="pb-3 lead"><span class="fw-bold me-2">Mobile number: </span>{{ user.student.mobile_number }}</p>
+                <p class="pb-3 lead"><span class="fw-bold me-2">Gender: </span>{{ user.student.gender }}</p>
+                <p class="pb-3 lead"><span class="fw-bold me-2">Education: </span>{{ user.student.level_of_education }}</p>
+                <!-- <p class="pb-3 lead"><span class="fw-bold me-2">Skills: </span>{{ user.student.skills }}</p> -->
+            </div>
+        </div>
         <form class="form" action="/update_profile/" method="get">
             {% csrf_token %}
-            <div class="text-start">
-                <input type = "submit" value = "Edit" class="btn btn-warning fw-bolder mt-5" />
+            <div class="text-center">
+                <input type = "submit" value = "Edit" class="btn btn-outline-secondary cl-btn" />
             </div>
         </form>
-        
+
+
 </div>
+
 
 {% endblock %}

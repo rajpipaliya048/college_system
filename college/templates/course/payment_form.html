@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-<form action="{% url 'course:stripe_payment' %}" method="POST">
+<form action="{% url 'course:stripe_payment' %}" method="POST" class="text-center">
     {% csrf_token %}
     <input type="hidden" name="amount" value="{{ amount }}">
     <input type="hidden" name="course_id" value="{{ course_id }}">
@@ -34,10 +34,16 @@
 
 </form>
 
-<form action="{% url 'course:initiate_payment'%}" method="POST">
+<form action="{% url 'course:initiate_payment'%}" method="POST" class="text-center">
   {% csrf_token %}
   <input type="hidden" name="course_id" value="{{ course_id }}">
   <input type="hidden" name="order_id" value="{{ order_id }}">
   <input type="submit" value="Pay with cashfree">
 </form>
+
+<div class="text-center mt-5">
+  <h4>Pay with PayPal</h4>
+  {{ form.render }}
+</div>
+
   {% endblock%}

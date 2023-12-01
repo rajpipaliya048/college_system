@@ -1,3 +1,7 @@
+body {
+    font-size: 18px;
+}
+
 .errorlist {
     color: red;
 }
@@ -45,7 +49,30 @@
 }
 
 .logo {
-    width: 200px;
-    height: 100px;
+    width: 120px;
     margin-left: 50px;
+}
+
+.cl-btn {
+    color: #0d6efd;
+}
+
+.cl-details-img {
+    width: 100%;
+    height: auto;
+}
+
+.btn:hover {
+    color: #fff;
+    background-color: #0d6efd;
+}
+
+.cl-form-btn {
+    color: #fff;
+    background-color: #0d6efd;
+}
+
+.cl-form-btn:hover {
+    color: #0d6efd;
+    background-color: #fff;
 }

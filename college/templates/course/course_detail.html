@@ -1,36 +1,44 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<div class="course-detail container">
-    <div class="course">
-        {% if course.course_img %}
-        <img src="{{ course.course_img.url }}" class="card-img-top" alt="">
+<section class="container">
+    <div class="row">
+        <div class="col-8">
+            <h1 class="fw-light pb-3">{{ course.course_name }}</h1 class="fw-light">
+            <p class="pb-3">{{ course.course_details }}</p>
+            <p class="pb-3"><span class="fw-bold">Department: </span>{{ course.department }}</p>
+            <p class="pb-3"><span class="fw-bold">Course start date: </span> {{ course.start_course }}</p>
+            <p class="pb-3"><span class="fw-bold">Course end date: </span>{{ course.end_course }}</p>
+            <p><span class="fw-bold">Fees: </span>$ {{ course.fees }}</p>
+            <!-- <div class="m-3">
+                <h4 class="">HTML output</h4>
+                {{ course.html_input|safe }}
+            </div> -->
+    
+            {% if user.is_authenticated %}
+                {% if enrolled_status %}
+                    <h5 class=" cl-btn">Enrolled</h5>
+                {% else %}
+                    <form class="form" action="/course/enroll/" method="post">
+                        {% csrf_token %}
+                        <div>
+                            <input type="hidden" name="course_id" value="{{ course.course_id }}">
+                            <input type="submit" value="Enroll Now" class="btn btn-outline-secondary cl-btn px-3 py-2" />
+                        </div>
+                    </form>
+                {% endif %}
         {% else %}
-        <img alt="course image" src="/college/media/course-images/download.jpeg">
+            <h5 class="fw-light">Please login to enroll in the course</h5>
         {% endif %}
-        <h5>{{ course.course_name }}</h5>
-        <p>{{ course.course_details }}</p>
-        <p><span>Department: </span>{{ course.department }}</p>
-        <p><span>Course start date: </span> {{ course.start_course }}</p>
-        <p><span>Course end date: </span>{{ course.end_course }}</p>
-        <p><span>Fees: </span>$ {{ course.fees }}</p>
-        <div class="m-3">
-            <h4 class="">HTML output</h4>
-            {{ course.html_input|safe }}
         </div>
-        {% if user.is_authenticated %}
-            <form class="form" action="/course/enroll/" method="post">
-                {% csrf_token %}
-                <div class="text-center">
-                    <input type="hidden" name="course_id" value="{{ course.course_id }}">
-                    <input type="submit" value="Enroll Now" class="btn btn-success fw-bolder mb-3" />
-                </div>
-            </form> 
-            
+        <div class="col-4">
+            {% if course.course_img %}
+            <img src="{{ course.course_img.url }}" class="cl-details-img">
             {% else %}
-            <h5 class="text-center">Please login to enroll in the course</h5>
+            <img alt="course image" src="{% static 'default.jpeg' %}" class="cl-details-img">
             {% endif %}
-
+        </div>
     </div>
-</div>
+</section>
 {% endblock%}

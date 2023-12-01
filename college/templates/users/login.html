@@ -1,19 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Log in</h1>
-    <form action="{% url 'login' %}" class="site-form" method="post">
-        {% csrf_token %}
-        {{ form }}
-        {% if request.GET.next %}
-            <input type="hidden" name="next" value="{{ request.GET.next }}">
-        {% endif %}
-        <input type="submit" value="Login">
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="w-25 mx-auto">
+        <h1 class="text-center fw-light my-5">Log In</h1>
+        <form action="{% url 'login' %}" class="site-form" method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}  
+    
+            <label for="{{ form.username.id_for_label }}" class="form-label mb-3 lead">Username:</label>
+            {{ form.username|add_class:"form-control" }}  
+            
+            <label for="{{ form.password.id_for_label }}" class="form-label mt-4 mb-3 lead">Password:</label>
+            {{ form.password|add_class:"form-control" }}  
+            
+            {% if request.GET.next %}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% endif %}
+            <div class="text-center">
+                <input type = "submit" value = "Login" class="btn btn-outline-secondary cl-form-btn mt-4" />
+            </div>
+        </form>
+    </div>
+    
+
+
+{% endblock %}

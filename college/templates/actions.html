@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container text-center">
-    <a href="{% url 'send_email' %}" class="text-decoration-none fw-bolder me-4">Send Emails</a>
-    <a href="{% url 'update_users_from_csv' %}" class="text-decoration-none fw-bolder me-4">Update users from csv</a>
-    <a href="{% url 'csv_report' %}" download="enrollment_report.csv" class="text-decoration-none fw-bolder me-4">Generate csv about enrollments</a>
-    <a href="{% url 'course:create_course' %}" class="text-decoration-none fw-bolder me-4">Create Course</a>
+<div class="container ">
+    <ul>
+        <li class="mb-4 ps-2"><a href="{% url 'send_email' %}" class="text-decoration-none mb-4">Bulk Emails</a></li>
+        <li class="mb-4 ps-2"><a href="{% url 'update_users_from_csv' %}" class="text-decoration-none mb-4">Update users data</a></li>
+        <li class="mb-4 ps-2"><a href="{% url 'csv_report' %}" download="enrollment_report.csv" class="text-decoration-none mb-4">Generate enrollments report</a></li>
+        <li class="mb-4 ps-2"><a href="{% url 'course:create_course' %}" class="text-decoration-none mb-4">Create Courses</a></li>
+        <li class="mb-4 ps-2"><a href="{% url 'payment_selection' %}" class="text-decoration-none mb-4">Payment gateway selection</a></li>
+
+    </ul>
 </div>
 
 {% endblock %}
