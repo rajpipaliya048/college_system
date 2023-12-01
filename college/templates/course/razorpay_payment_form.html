@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+  <form class="text-center border border-light p-5" actiom="{% url 'course:initiate_razorpay_payment' %}" method="POST">
+    {% csrf_token %}
+
+    <input type="hidden" name="amount" value="{{ amount }}">
+    <input type="hidden" name="course_id" value="{{ course_id }}">
+
+   
+    <script src="https://checkout.razorpay.com/v1/checkout.js" 
+    data-key="rzp_test_cbbT64IJEOxbfw" 
+    data-amount="{{ amount }}"
+    data-currency="INR" 
+    data-order_id="{{payment.id}}" 
+    data-buttontext="Pay with Razorpay"
+    data-name="Professional Cipher"
+    data-description="Django and Data Science"
+    data-prefill.name="PC"
+    data-prefill.email="pc@studygyaan.com" 
+    data-theme.color="#F37254"></script>
+
+</form>
+  {% endblock%}

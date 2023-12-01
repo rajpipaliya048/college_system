@@ -30,11 +30,13 @@ class Course(models.Model):
     html_input = models.TextField(null=True)
     
     def __str__(self):
-        return self.course_name
+        return self.course_id
     
+    def snippet_title(self):
+        return self.course_name[:30] + '...'
     
     def snippet(self):
-        return self.course_details[:50] + '...'  
+        return self.course_details[:70] + '...'  
     
 class Enrollment(models.Model):
     user_id = models.ForeignKey(Student, on_delete= models.CASCADE)

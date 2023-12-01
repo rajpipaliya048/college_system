@@ -1,17 +1,14 @@
 import datetime
-import random
 import razorpay
 import requests
 import stripe
-import time
 from course.forms import CourseForm
 from course.models import Course, Enrollment
-from decimal import Decimal
+from course.utility import generate_unique_order_id
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, JsonResponse
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -38,40 +35,23 @@ class CreateCourseView(View):
 
 class CourseListView(ListView):
     model = Course
-    paginate_by = 3
+    paginate_by = 15
 class CourseEnrollView(View):
     
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
+        payment_gateway = request.session.get('payment_gateway') 
+        print('\n'*5)
+        print(payment_gateway)
+        print('\n'*5)           
         student = self.request.user.student
         course_id = self.request.POST.get('course_id')
         student = self.request.user.student           
         current_date = datetime.date.today()
         course = get_object_or_404(Course, course_id=course_id)
-        enrolled = Enrollment.objects.get_or_create(user_id=student, course_id=course, enrollment_date=current_date,)
+        enrolled = Enrollment.objects.get_or_create(user_id=student, course_id=course, enrollment_date=current_date)
         fees = course.fees * 100
         order_id = generate_unique_order_id()
-        if course.fees != 0:    
-            return render(request, 'course/payment_form.html', {'course_id': course.course_id, 'amount': fees, 'order_id': order_id}) 
-            
-        else:
-            obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
-            obj.isactive = True
-            obj.save() 
-
-@csrf_exempt
-def payment_done(request):
-    return render(request, 'course/payment_done.html')
-
-
-@csrf_exempt
-def payment_canceled(request):
-    return render(request, 'course/payment_cancelled.html')
-
-class PaypalPaymentView(View):
-    def post(self, request):
-        course_id = self.request.POST.get('course_id')
-        course = get_object_or_404(Course, course_id=course_id)
         host = request.get_host()
 
         paypal_dict = {
@@ -84,7 +64,26 @@ class PaypalPaymentView(View):
             'cancel_return': 'http://{}{}'.format(host,reverse('course:payment_cancelled')),
         }
         form = PayPalPaymentsForm(initial=paypal_dict)
-        return render(request, 'course/process_payment.html', {'course': course, 'form': form})
+        if course.fees != 0:    
+            if payment_gateway == 'paypal':
+                return render(request, 'course/paypal_payment_form.html', {'course_id': course.course_id, 'amount': fees, 'order_id': order_id, 'form': form})
+            if payment_gateway == 'stripe':
+                return render(request, 'course/stripe_payment_form.html', {'course_id': course.course_id, 'amount': fees, 'order_id': order_id})
+            if payment_gateway == 'cashfree':
+                return render(request, 'course/cashfree_payment_form.html', {'course_id': course.course_id, 'amount': fees, 'order_id': order_id})
+            if payment_gateway == 'razorpay':
+                return render(request, 'course/razorpay_payment_form.html', {'course_id': course.course_id, 'amount': fees, 'order_id': order_id})
+            return render(request, 'course/payment_form.html', {'course_id': course.course_id, 'amount': fees, 'order_id': order_id, 'form': form}) 
+
+            
+            
+            return render(request, 'course/payment_form.html', {'course_id': course.course_id, 'amount': fees, 'order_id': order_id, 'form': form})
+        else:
+            obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
+            obj.isactive = True
+            obj.save() 
+            return redirect('dashboard')
+
     
 class StripePaymentView(View):
     def post(self, request):
@@ -111,6 +110,33 @@ class StripePaymentView(View):
         )
         return redirect('dashboard')
  
+class CourseUnenrollView(View):
+    def post(self, *args, **kwargs):
+        course_id = self.request.POST.get('course_id')
+        student = self.request.user.student
+        obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
+        obj.isactive = False
+        obj.save()
+        return redirect('home')
+   
+   
+# function based views
+def course_detail_view(request, course_id):
+    course = Course.objects.get(course_id=course_id)
+    enrolled_status = Enrollment.objects.filter(course_id=course_id, user_id = request.user.student, isactive=True)
+    context = {
+        'course': course,
+        'enrolled_status': enrolled_status,
+    }
+    return render(request, 'course/course_detail.html', context)
+
+@csrf_exempt
+def payment_done(request):
+    return redirect('dashboard')
+
+@csrf_exempt
+def payment_canceled(request):
+    return render(request, 'course/payment_cancelled.html')
 
 def initiate_razorpay_payment(request):
     if request.method == "POST":
@@ -182,24 +208,3 @@ def initiate_cashfree_payment(request):
         return render(request, 'course/cashfree_payment.html', {'payment_session_id': payment_session_id, 'order_id': order_id })
     else:
         return JsonResponse({'error': 'Failed to initiate payment'})
-
-class CourseUnenrollView(View):
-    def post(self, *args, **kwargs):
-        course_id = self.request.POST.get('course_id')
-        student = self.request.user.student
-        obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
-        obj.isactive = False
-        obj.save()
-        return redirect('course:course_list')
-   
-
-def course_detail_view(request, course_id):
-    course = get_object_or_404(Course, course_id=course_id)
-    return render(request, 'course/course_detail.html', {'course': course})
-
-
-def generate_unique_order_id():
-    timestamp = int(time.time() * 1000)
-    random_number = random.randint(1000, 9999)
-    order_id = f"{timestamp}{random_number}"
-    return order_id

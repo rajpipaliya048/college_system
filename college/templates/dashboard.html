@@ -1,30 +1,36 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="text-center mt-5">Enrolled Courses</h1>
-<div class="courses container">
-    <div class="row">
-        {% for course in courses %}
-        <div class="card m-5" style="width: 18rem;">
-          <form class="form" action="/course/unenroll/" method="post">
-              {% csrf_token %}
-                <img src="{{ course.course_img.url }}" class="card-img-top" alt="">
-                <div class="card-body">
-                  <h5 class="card-title">{{ course.course_name }}</h5>
-                  <p class="card-text">{{ course.snippet }}</p>
-                  <p class="card-text fw-bolder">{{ course.department }}</p>
-                  <p class="card-text">{{ course.start_course }}</p>
-                  <p class="card-text">{{ course.end_course }}</p>
-                </div>
-                <input type="hidden" name="course_id" value="{{ course.course_id }}">
-                <div class="text-center">
-                    <input type = "submit" value = "Un-Enroll" class="btn btn-danger fw-bolder mb-3" />
-                </div>
-              </form>
-          </div>
-        {% endfor %}
-    </div>
 
+<div class="container">
+  <h1 class="text-center my-5 fw-light">Enrolled Courses</h1>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+    {% for course in courses %}
+    <div class="col">
+      <form class="form" action="/course/unenroll/" method="post">
+      {% csrf_token %}
+      <div class="card shadow-sm">
+        <img class="bd-placeholder-img card-img-top" width="100%" height="225" src="{{ course.course_img.url }}">
+        <div class="card-body">
+          <h5 class="card-title">{{ course.snippet_title }}</h5>
+          <p class="card-text">{{ course.snippet }}</p>
+          <p class="card-text fw-bolder">{{ course.department }}</p>
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="btn-group">
+              <input type="hidden" name="course_id" value="{{ course.course_id }}">
+              <button type="submit" class="btn btn-outline-secondary cl-btn">Un-Enroll</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    </div>
+    {% endfor %}
+  </div>
+{% if not courses %}
+<h2 class="mt-5 text-center">You have not enrolled any courses yet. Please <a href="{% url 'home' %}">click here</a> to enroll courses</h2>
+{% endif %}
 </div>
+
 
 {% endblock %}

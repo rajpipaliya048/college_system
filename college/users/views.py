@@ -1,16 +1,14 @@
-import csv
-from .forms import StudentForm, UpdateProfileForm
-from .models import Student
+import logging
+import os
+from course.models import Course
 from course.models import Enrollment
-from .tokens import account_activation_token
+from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.mail import send_mail
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, FileResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -18,12 +16,16 @@ from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import UpdateView
-from users.tasks import update_user_details_from_csv, send_email_to_users
+from users.decorators import superuser_required
+from users.forms import StudentForm, UpdateProfileForm
+from users.models import Student
+from users.tasks import update_user_details_from_csv, send_email_to_users, generate_csv_report
+from users.tokens import account_activation_token
+from django.core.cache import cache
 
-
-
+logger = logging.getLogger(__name__)
+# signup view
 class SignupView(View):
     
     def get(self, request):
@@ -43,14 +45,13 @@ class SignupView(View):
             mobile_number = form.cleaned_data['mobile_number']
             gender = form.cleaned_data['gender']
             level_of_education = form.cleaned_data['level_of_education']
-            skills = form.cleaned_data['skills']
+            # skills = form.cleaned_data['skills']
             student = Student.objects.get_or_create(user=user, 
                                                     age=age, 
                                                     country=country, 
                                                     mobile_number=mobile_number, 
                                                     gender=gender, 
                                                     level_of_education=level_of_education, 
-                                                    skills=skills
                                                     )
                         
             current_site = get_current_site(request)
@@ -66,29 +67,9 @@ class SignupView(View):
             return redirect('account_activation_sent')
         return render(request, 'users/signup.html', {'form': form})
 
-@login_required
-def account_activation_sent(request):
-    return render(request, 'users/account_activation_sent.html')
-
-def activate(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, Student.DoesNotExist, Exception):
-        user = None
-    if user is not None and account_activation_token.check_token(user, token):
-        user.is_active = True
-        user.save()
-        login(request, user)
-        return redirect('account_activation_complete')
-    else:
-        return HttpResponseBadRequest('Activation link is invalid!')
-
-@login_required
-def account_activation_complete(request):
-    return render(request, 'users/account_activation_complete.html')
+# login view
 class LoginView(View):
-    
+
     def get(self, request):
         if request.user.is_authenticated:
             return redirect('home')
@@ -100,7 +81,7 @@ class LoginView(View):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')
+            return redirect('dashboard')
         return render(request, 'users/login.html', {'form': form})
     
 def update_skills(request):
@@ -111,15 +92,13 @@ def update_skills(request):
         return redirect('dashboard')
     return render(request, 'users/update_skills.html')
 
+
+# logout view
 class LogoutView(View):
     def get(self, request):
         logout(request)
-        return redirect('login')
+        return redirect('/')
 
-@login_required
-def user_profile(request):
-    student = request.user.student
-    return render(request, 'users/user_profile.html', {'student': student})
 
 # class EditProfileView(View):
     
@@ -170,6 +149,7 @@ def user_profile(request):
 #             return redirect('dashboard')
         
 
+# edit student data by user(student)
 class EditProfileView(UpdateView):
 
     model = Student
@@ -181,11 +161,117 @@ class EditProfileView(UpdateView):
     
     success_url ="/profile"
     
+
+# admin actions views
+@method_decorator(superuser_required, name='dispatch')
+class UpdateUserFromCsv(View):
+    def get(self, request):
+        return render(request, 'users/update_user_from_csv.html')
+
+    
+    def post(self, request):
+        csv_file = request.FILES["csv_input"]
+        if not csv_file.name.endswith('.csv'):
+            return HttpResponseRedirect(reverse("update_users_from_csv"))
+        file_data = csv_file.read().decode("utf-8")
+        update_user_details_from_csv.delay(file_data)
+        logger.info("user data updated with the use of csv")
+        return redirect('/')
+    
+   
+@method_decorator(superuser_required, name='dispatch')
+class SendEmail(View):
+    
+    def get(self, request):
+        courses = Course.objects.all()
+        course_ids = [course.course_id for course in courses]
+        return render(request, 'users/send_mass_mail.html', {'course_ids': course_ids})
+    
+    def post(self, request):
+        message = request.POST.get('message', 'Default message')
+        subject = request.POST.get('subject', 'Default subject')
+        course_list = request.POST.get('course_list')
+        course = course_list.split(',')
+        logger.info("Sending Email started") 
+        enrolled_users_emails = []
+        for course_id in course:
+            enrollments = Enrollment.objects.filter(course_id=course_id)
+            for enrollment in enrollments:
+                enrolled_users_emails.append(enrollment.user_id.user.email)
+        send_email_to_users.delay(enrolled_users_emails, subject, message)
+        return redirect('/')
+    
+@method_decorator(superuser_required, name='dispatch')
+class CsvReport(View):
+    def get(self, request):
+        data = cache.get('report')
+        if not data:
+            generate_csv_report.delay()
+            logger.info("New csv report generated") 
+
+        file = os.path.join(settings.BASE_DIR, 'report/enrollment_report.csv')
+        fileopened = open(file, 'rb')
+        return FileResponse(fileopened)
+    
+@method_decorator(superuser_required, name='dispatch')
+class Actions(View):
+    def get(self, request):
+        return render(request, 'actions.html')
+    
+    
+@method_decorator(superuser_required, name='dispatch')
+class PaymentSelectionView(View):
+    def get(self, request):
+        return render(request, 'users/payment_selection.html')
+    
+    def post(self, request):
+        payment_gateway = self.request.POST.get('gateway')
+        request.session['payment_gateway'] = payment_gateway
+        print('\n'*5)
+        print(payment_gateway)
+        print('\n'*5) 
+        print('\n'*5)
+        print(request.session['payment_gateway'])
+        print('\n'*5)
+        return redirect('home')
+    
+    
+# end of admin actions views
+
+@login_required
+def account_activation_sent(request):
+    return render(request, 'users/account_activation_sent.html')
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, Student.DoesNotExist, Exception):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        return redirect('account_activation_complete')
+    else:
+        return HttpResponseBadRequest('Activation link is invalid!')
+
+@login_required
+def account_activation_complete(request):
+    return render(request, 'users/account_activation_complete.html')
+
+@login_required
+def user_profile(request):
+    if not request.user.is_superuser:
+        student = request.user.student
+        return render(request, 'users/user_profile.html', {'student': student})
+    return render(request, 'users/user_profile.html',)
+
 @login_required
 def email_update_sent(request):
     return render(request, 'users/email_update_sent.html')
 
-def update(request, uidb64, token):
+def update_email(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
@@ -202,29 +288,3 @@ def update(request, uidb64, token):
 @login_required
 def email_updated(request):
     return render(request, 'users/email_updated.html')
-
-@csrf_exempt
-def update_users_from_csv(request):
-    if request.method == 'GET':
-        return render(request, 'users/update_user_from_csv.html')
-    
-    if request.method == 'POST':
-        csv_file = request.FILES["csv_input"]
-        if not csv_file.name.endswith('.csv'):
-            return HttpResponseRedirect(reverse("update_users_from_csv"))
-        file_data = csv_file.read().decode("utf-8")
-        print(file_data)
-        update_user_details_from_csv.delay(file_data)
-        return redirect('/')
-
-@csrf_exempt
-def send_email(request):
-    if request.method == 'POST':
-        message = request.POST['message']
-        subject = request.POST['subject']
-        enrollments = Enrollment.objects.all()
-        enrolled_users_emails = [enrollment.user_id.user.email for enrollment in enrollments]
-        for user in enrolled_users_emails:
-            send_email_to_users(user, subject, message)
-        return redirect('/')
-    return render(request, 'users/send_mass_mail.html')

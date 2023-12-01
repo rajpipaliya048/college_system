@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<form action="{% url 'course:stripe_payment' %}" method="POST" class="text-center">
+    {% csrf_token %}
+    <input type="hidden" name="amount" value="{{ amount }}">
+    <input type="hidden" name="course_id" value="{{ course_id }}">
+    <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+      data-key="pk_test_51O6YLUSBeOYLWagPZMg7d5G2hsazpZNUR1hLv7RB0Gz4MxLm7eqxG9ORK2CD6XC9NK9Il2GdOKMkY4PWkqW8vyTO00DtxsPBjj"
+      data-amount={{amount}}
+      data-name={{course_id}}
+      data-description="Enroll in the course"
+      data-locale="auto">
+    </script>
+</form>
+
+  {% endblock%}

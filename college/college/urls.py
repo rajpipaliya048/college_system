@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from users.views import SignupView, LoginView, LogoutView, EditProfileView
+from users.views import Actions, SignupView, LoginView, LogoutView, EditProfileView, SendEmail, UpdateUserFromCsv, CsvReport, PaymentSelectionView
 from django.conf.urls.static import static
 from django.conf import settings
 from . import views
@@ -23,9 +23,17 @@ urlpatterns = [
     path('activate/<uidb64>/<token>/', userviews.activate, name='activate'),
     path('account_activation_complete/', userviews.account_activation_complete, name='account_activation_complete'),
     path('email_update_sent/', userviews.email_update_sent, name='email_update_sent'),
-    path('update/<uidb64>/<token>/', userviews.update, name='update'),
+    path('update/<uidb64>/<token>/', userviews.update_email, name='update'),
     path('email_updated/', userviews.email_updated, name='email_updated'),
     path('update-skills/', userviews.update_skills, name='update_skills'),
+    path('update-users-from-csv/', UpdateUserFromCsv.as_view(), name='update_users_from_csv'),
+    path('send-email/', SendEmail.as_view(), name='send_email'),
+    path('csv-report/', CsvReport.as_view(), name='csv_report'),
+    path('actions/', Actions.as_view(), name='actions'),
+    path('payment-selection/', PaymentSelectionView.as_view(), name='payment_selection'),
+
+
+
 ]
 
 

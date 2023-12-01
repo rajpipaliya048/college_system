@@ -1,36 +1,41 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<h1 class="text-center">Courses</h1>
-<div class="courses container">
-    <div class="row">
-        {% for course in object_list %}
-        <div class="card m-5" style="width: 18rem;">
-                {% if course.course_img %}
-                <img src="{{ course.course_img.url }}" class="card-img-top" alt="">
-                {% else %}
-                <img alt="course image" src="/college/media/course-images/download.jpeg">
-                {% endif %}
-                <div class="card-body">
-                  <h5 class="card-title">{{ course.course_name }}</h5>
-                  <p class="card-text">{{ course.snippet }}</p>
-                  <p class="card-text fw-bolder">{{ course.department }}</p>
-                  <p class="card-text">{{ course.start_course }}</p>
-                  <p class="card-text">{{ course.end_course }}</p>
-                </div>
-                <div class="text-center">
-                    <a class="btn btn-success fw-bolder mb-3"  href="{% url 'course:detail' course_id=course.course_id %}">View course</a>
-                </div>
-            </form>
+
+<div class="container">
+    <h1 class="text-center fw-light my-5">Courses</h1>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+      {% for course in object_list %}
+      <div class="col mb-4">
+        <div class="card shadow-sm">
+            {% if course.course_img %}
+          <img class="bd-placeholder-img card-img-top mx-auto mt-1" src="{{ course.course_img.url }}" style="max-width: fit-content; height: 225px;">
+          {% else %}
+          <img src="{% static 'default.jpeg' %}" class="bd-placeholder-img card-img-top mx-auto mt-1" style="max-width: fit-content; height: 225px;">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ course.snippet_title }}</h5>
+            <p class="card-text">{{ course.snippet }}</p>
+            <p class="card-text"><span class="fw-bolder">Department: </span>{{ course.department }}</p>
+            <p class="card-text"><span class="fw-bolder">Start date: </span>{{ course.start_course }}</p>
+            <p class="card-text"><span class="fw-bolder">End date: </span>{{ course.end_course }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="btn-group">
+                <a class="btn btn-outline-secondary cl-btn"  href="{% url 'course:detail' course_id=course.course_id %}">View course</a>
+              </div>
+            </div>
           </div>
-        {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
     </div>
 </div>
 
-<div class="pagination justify-content-center fw-bolder text-dark">
+<div class="pagination justify-content-center fw-bolder text-dark mt-2 mb-5">
   <span class="step-links">
       {% if page_obj.has_previous %}
-          <a href="?page=1" class="text-decoration-none text-info">&laquo; first</a>
-          <a href="?page={{ page_obj.previous_page_number }}" class="text-decoration-none text-info ms-3">previous</a>
+          <a href="?page=1" class="text-decoration-none" style="color: #0d6efd;">&laquo; first</a>
+          <a href="?page={{ page_obj.previous_page_number }}" class="text-decoration-none ms-3">previous</a>
       {% endif %}
 
       <span class="current mx-3">
@@ -38,8 +43,8 @@
       </span>
 
       {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}" class="text-decoration-none text-info me-3">next</a>
-          <a href="?page={{ page_obj.paginator.num_pages }}" class="text-decoration-none text-info">last &raquo;</a>
+          <a href="?page={{ page_obj.next_page_number }}" class="text-decoration-none me-3">next</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}" class="text-decoration-none">last &raquo;</a>
       {% endif %}
   </span>
 </div>
