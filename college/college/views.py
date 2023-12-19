@@ -1,14 +1,7 @@
-from django.shortcuts import render, get_object_or_404
 from course.models import Course, Enrollment
-from users.models import Student
 from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.contrib.auth.models import User
-from django.http import Http404
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str
-from django.contrib.auth import login, logout
+from django.shortcuts import render, get_object_or_404
+from users.models import Student
 
 @login_required
 def dashboard(request):

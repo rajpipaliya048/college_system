@@ -14,7 +14,7 @@ SECRET_KEY = 'django-insecure-(advk8gos=zsx24gjac=dww%rmb4_-8=#z+ww4gle49m6tkf@#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.mycollege.com','course.mycollege.com', 'mycollege.com','1200-117-219-102-26.ngrok-free.app']
+ALLOWED_HOSTS = ['www.mycollege.com','course.mycollege.com', 'mycollege.com', 'localhost','127.0.0.1',]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://1200-117-219-102-26.ngrok-free.app'
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'users',
     'course',
     'paypal.standard.ipn',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +59,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'users.middleware.RequestLoggingMiddleware',
     'users.middleware.AdminAccessOnlyMiddleware',
-    # 'users.middleware.AddSkillsMiddleware',
 ]
 
 CACHE_MIDDLEWARE_ALIAS = 'default'

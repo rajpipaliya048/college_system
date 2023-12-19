@@ -11,10 +11,6 @@
             <p class="pb-3"><span class="fw-bold">Course start date: </span> {{ course.start_course }}</p>
             <p class="pb-3"><span class="fw-bold">Course end date: </span>{{ course.end_course }}</p>
             <p><span class="fw-bold">Fees: </span>$ {{ course.fees }}</p>
-            <!-- <div class="m-3">
-                <h4 class="">HTML output</h4>
-                {{ course.html_input|safe }}
-            </div> -->
     
             {% if user.is_authenticated %}
                 {% if enrolled_status %}
