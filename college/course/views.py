@@ -4,6 +4,7 @@ import requests
 import stripe
 from course.forms import CourseForm
 from course.models import Course, Enrollment
+from course.serializers import CourseSerializer
 from course.utility import generate_unique_order_id
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -16,6 +17,9 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.list import ListView
 from paypal.standard.forms import PayPalPaymentsForm
+from rest_framework.generics import RetrieveAPIView, CreateAPIView, GenericAPIView
+from rest_framework import mixins
+from rest_framework.permissions import IsAuthenticated, BasePermission
 
 razorpay_client = razorpay.Client(
     auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -74,9 +78,6 @@ class CourseEnrollView(View):
             if payment_gateway == 'razorpay':
                 return render(request, 'course/razorpay_payment_form.html', {'course_id': course.course_id, 'amount': fees, 'order_id': order_id})
             return render(request, 'course/payment_form.html', {'course_id': course.course_id, 'amount': fees, 'order_id': order_id, 'form': form}) 
-
-            
-            
             return render(request, 'course/payment_form.html', {'course_id': course.course_id, 'amount': fees, 'order_id': order_id, 'form': form})
         else:
             obj = get_object_or_404(Enrollment, user_id=student, course_id=course_id)
@@ -118,7 +119,43 @@ class CourseUnenrollView(View):
         obj.isactive = False
         obj.save()
         return redirect('home')
-   
+
+class SuperuserPermission(BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_superuser
+    
+class CourseAPIView(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,GenericAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    lookup_field = 'course_id'
+    permission_classes = [IsAuthenticated, SuperuserPermission]
+    
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+class CourseListAPIView(mixins.ListModelMixin, mixins.CreateModelMixin, GenericAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    lookup_field = 'course_id'
+    permission_classes = [IsAuthenticated, SuperuserPermission]
+    
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+class CourseCreateAPIView(CreateAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated, SuperuserPermission]
+
    
 # function based views
 def course_detail_view(request, course_id):
