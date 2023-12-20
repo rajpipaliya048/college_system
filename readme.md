@@ -1,20 +1,53 @@
-# College system web application
+# Django Based Web-Application
 
-### requirements to run the project:
-        - python 3.0+
-        - mysql
+Django is very popular framework of python to build web applications.
 
-### steps to run the project in your system:
-        1. open terminal
-        2. git clone https://github.com/rajpipaliya048/college_system.git
-        3. cd college_system
-        4. create virtual environment
-        5. pip install -r requirements.txt 
-        6. cd college
-        7. python3 manage.py runserver
+This project is based on selling the courses.
 
-### for celery tasks:
-        1. open new terminal
-        2. start redis server
-        3. stat celery worker using this command
-            - python3 -m celery -A college worker -l info
+## Steps to Run the Project
+
+>Open Terminal
+
+>Make clone of project
+
+```bash
+  git clone https://github.com/rajpipaliya048/college_system.git
+```
+
+>Create a virtual environment in project directory
+
+```bash
+  python -m venv <name_of_virtual_environment>
+```
+
+>Install all the required packages in virtual environment
+
+```bash
+  pip install -r requirements.txt
+```
+>Now, Yor're ready to run the project
+
+```bash
+  python manage.py runserver
+```
+> For frontend hit "127.0.0.1:8000" in browser's url
+
+### For Celery Tasks
+
+>Start redis server
+
+```bash
+redis-server
+```
+>Start Celery Worker
+
+```bash
+python -m celery -A college worker -l info
+```
+
+>Also, start the mailcatcher service to get emails, To start mailcatcher simpally run following command in Terminal
+
+```bash
+mailcatcher
+```
+> To check emails hit "http://127.0.0.1:1080/" url in browser
