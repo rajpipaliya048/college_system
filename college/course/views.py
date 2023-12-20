@@ -17,7 +17,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.list import ListView
 from paypal.standard.forms import PayPalPaymentsForm
-from rest_framework.generics import RetrieveAPIView, CreateAPIView, GenericAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework import mixins
 from rest_framework.permissions import IsAuthenticated, BasePermission
 
@@ -160,7 +160,10 @@ class CourseCreateAPIView(CreateAPIView):
 # function based views
 def course_detail_view(request, course_id):
     course = Course.objects.get(course_id=course_id)
-    enrolled_status = Enrollment.objects.filter(course_id=course_id, user_id = request.user.student, isactive=True)
+    if request.user.is_authenticated:
+        enrolled_status = Enrollment.objects.filter(course_id=course_id, user_id = request.user.student, isactive=True)
+    else:
+        enrolled_status = None
     context = {
         'course': course,
         'enrolled_status': enrolled_status,

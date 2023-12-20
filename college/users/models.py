@@ -15,7 +15,7 @@ class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     age = models.PositiveBigIntegerField()
     country = CountryField()
-    mobile_number = models.IntegerField()
+    mobile_number = models.CharField(max_length=10)
     gender_choice = [(male, "male"), (female, "female"),]
     gender = models.CharField(max_length=6, choices=gender_choice,)
     education_choice = [(ssc, '10th pass'), 
