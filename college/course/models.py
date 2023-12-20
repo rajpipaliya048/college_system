@@ -1,6 +1,6 @@
-from django.db import models
-from django.core.exceptions import ValidationError
 import re
+from django.core.exceptions import ValidationError
+from django.db import models
 from django.shortcuts import reverse
 from users.models import Student
 

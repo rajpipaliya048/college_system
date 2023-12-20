@@ -1,7 +1,7 @@
-from django.forms import ModelForm
+from course.models import Course
 from django import forms
-from .models import Course
 from django.core.exceptions import ValidationError
+from django.forms import ModelForm
 
 class DateInput(forms.DateInput):
     input_type = 'date'

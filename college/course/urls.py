@@ -1,6 +1,6 @@
 import re
 from course import views
-from course.views import CreateCourseView, CourseListView, CourseEnrollView, CourseUnenrollView, StripePaymentView
+from course.views import CourseAPIView, CreateCourseView, CourseListAPIView, CourseListView, CourseEnrollView, CourseUnenrollView, StripePaymentView
 from django.urls import path, re_path
 
 app_name = 'course'
@@ -15,6 +15,8 @@ urlpatterns = [
     path('payment-done/', views.payment_done, name='payment_done'),
     path('payment-cancelled/', views.payment_canceled, name='payment_cancelled'),
     path('stripe_payment/', StripePaymentView.as_view(), name='stripe_payment'),
+    path('api/<str:course_id>/', CourseAPIView.as_view(), name='course-detail'),
+    path('api/', CourseListAPIView.as_view(), name='course-list'),
     re_path(r'^(?P<course_id>[\w-]+)/$', views.course_detail_view, name='detail'),
 
 ]

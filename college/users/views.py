@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.cache import cache
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, FileResponse
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
@@ -22,7 +23,6 @@ from users.forms import StudentForm, UpdateProfileForm
 from users.models import Student
 from users.tasks import update_user_details_from_csv, send_email_to_users, generate_csv_report
 from users.tokens import account_activation_token
-from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 # signup view
@@ -98,57 +98,7 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('/')
-
-
-# class EditProfileView(View):
-    
-#     @method_decorator(login_required)
-#     def get(self, request):
-#         user = request.user
-#         student = self.request.user.student
-#         form = UpdateProfileForm(initial={'age': student.age, 
-#                                     'email': student.user.email, 
-#                                     'first_name': student.user.first_name, 
-#                                     'last_name': student.user.last_name, 
-#                                     'country': student.country, 
-#                                     'mobile_number': student.mobile_number, 
-#                                     'gender': student.gender, 
-#                                     'level_of_education': student.level_of_education
-#                                     })
-#         return render(request, 'users/profile_update.html', {'form': form})
-    
-#     @method_decorator(login_required)
-#     def post(self, request):
-#         form = UpdateProfileForm(request.POST)
-#         if form.is_valid():
-#             user = request.user
-#             student = self.request.user.student
-            
-#             student.user.first_name = form.cleaned_data['first_name']
-#             student.user.last_name = form.cleaned_data['last_name']
-#             student.age = form.cleaned_data['age']
-#             student.country = form.cleaned_data['country']
-#             student.mobile_number = form.cleaned_data['mobile_number']
-#             student.gender = form.cleaned_data['gender']
-#             student.level_of_education = form.cleaned_data['level_of_education']
-#             student.save()
-#             global new_email
-#             new_email = form.cleaned_data['email']
-            
-#             if student.user.email != new_email:
-#                 current_site = get_current_site(request)
-#                 subject = 'Activate your account'
-#                 message = render_to_string('users/email_updation_email.html', {
-#                     'user': user,
-#                     'domain': current_site.domain,
-#                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-#                     'token': account_activation_token.make_token(user),
-#                 })
-#                 user.email_user(subject, message)
-#                 return redirect('email_update_sent')
-#             return redirect('dashboard')
-        
-
+     
 # edit student data by user(student)
 class EditProfileView(UpdateView):
 
@@ -227,12 +177,6 @@ class PaymentSelectionView(View):
     def post(self, request):
         payment_gateway = self.request.POST.get('gateway')
         request.session['payment_gateway'] = payment_gateway
-        print('\n'*5)
-        print(payment_gateway)
-        print('\n'*5) 
-        print('\n'*5)
-        print(request.session['payment_gateway'])
-        print('\n'*5)
         return redirect('home')
     
     
@@ -278,7 +222,6 @@ def update_email(request, uidb64, token):
     except (TypeError, ValueError, OverflowError, Student.DoesNotExist, Exception):
         user = None
     if user is not None and account_activation_token.check_token(user, token):
-        # user.email = new_email
         user.save()
         login(request, user)
         return redirect('email_updated')

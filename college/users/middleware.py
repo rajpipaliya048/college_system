@@ -18,11 +18,3 @@ class AdminAccessOnlyMiddleware(MiddlewareMixin):
         if request.path == '/course/create/' and not request.user.is_staff:
             return HttpResponseForbidden("Accessible for admins only")
         
-# class AddSkillsMiddleware(MiddlewareMixin):
-    
-#     def process_request(self, request):
-#         if request.user.is_authenticated and not request.user.is_superuser and not request.path == '/update-skills/' and not request.path.startswith('/admin/'):
-#             student = request.user.student
-#             skills = student.skills
-#             if not skills:
-#                 return render(request, 'users/update_skills.html')

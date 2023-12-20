@@ -1,12 +1,12 @@
-from django.contrib import admin
-from django.urls import path, include
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from users.views import Actions, SignupView, LoginView, LogoutView, EditProfileView, SendEmail, UpdateUserFromCsv, CsvReport, PaymentSelectionView
-from django.conf.urls.static import static
-from django.conf import settings
-from . import views
+from college import views
 from course.views import CourseListView
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.urls import path, include
 from users import views as userviews
+from users.views import Actions, SignupView, LoginView, LogoutView, EditProfileView, SendEmail, UpdateUserFromCsv, CsvReport, PaymentSelectionView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,6 +31,7 @@ urlpatterns = [
     path('csv-report/', CsvReport.as_view(), name='csv_report'),
     path('actions/', Actions.as_view(), name='actions'),
     path('payment-selection/', PaymentSelectionView.as_view(), name='payment_selection'),
+    # path('api/', include('course.urls')),
 
 
 
