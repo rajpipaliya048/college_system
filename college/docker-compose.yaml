@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+
+# Redis
+    redis:
+        image: redis:5.0.14
+        container_name: redis
+        ports:
+            - "6379:6379"
+        entrypoint: redis-server --appendonly yes
+
+
+# Database
+    db:
+        image: mysql:8.0
+        container_name: college_db
+        volumes:
+          - ./data.sql:/docker-entrypoint-initdb.d/data.sql
+        environment:
+          MYSQL_DATABASE: mycollege
+          MYSQL_ROOT_PASSWORD: 09888
+
+# Django Application
+    django:
+        build: .
+        container_name: college
+        command: python manage.py runserver 0.0.0.0:8000
+        volumes:
+            - .:/usr/src/college
+        ports:
+            - "8000:8000"
+        depends_on:
+            - db
+
+# Celery
+    celery:
+        restart: always
+        build:
+            context: .
+        command: python3 -m celery -A college worker -l info
+        volumes:
+            - .:/usr/src/college
+        container_name: celery
+        depends_on:
+            - db
+            - redis
+            - django
