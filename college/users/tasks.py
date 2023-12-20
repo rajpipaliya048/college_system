@@ -1,12 +1,14 @@
 import csv
+import os
 from celery import shared_task
 from course.models import Course, Enrollment
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from io import StringIO
 from users.models import Student
-from django.core.cache import cache
 
 
 
@@ -41,11 +43,11 @@ def send_email_to_users(user, subject, message):
 def generate_csv_report():
     courses = Course.objects.all()
     enrollments = Enrollment.objects.select_related('user_id', 'course_id').filter(isactive=True)
+    file_path = os.path.join(settings.BASE_DIR, 'report', 'enrollment_report.csv')
     
-    with open('/media/raj/Doom/college_project/college/report/enrollment_report.csv', 'w', newline='') as csvfile:
+    with open(file_path, 'w', newline='') as csvfile:
         fieldnames = ['User ID', 'User Name', 'Course ID', 'Course Name', 'Course Details' , 'Enrollment Date']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        
         writer.writeheader()
 
         for enrollment in enrollments:
