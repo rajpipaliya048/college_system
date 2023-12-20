@@ -2,3 +2,4 @@ myenv
 *.pyc
 *.log
 .env
+report
