@@ -8,6 +8,7 @@ from course.serializers import CourseSerializer
 from course.utility import generate_unique_order_id
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -17,9 +18,13 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.list import ListView
 from paypal.standard.forms import PayPalPaymentsForm
-from rest_framework.generics import CreateAPIView, GenericAPIView
-from rest_framework import mixins
-from rest_framework.permissions import IsAuthenticated, BasePermission
+from rest_framework import   viewsets
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
+from users.models import Student
+
 
 razorpay_client = razorpay.Client(
     auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -119,44 +124,30 @@ class CourseUnenrollView(View):
         obj.isactive = False
         obj.save()
         return redirect('home')
-
-class SuperuserPermission(BasePermission):
-    def has_permission(self, request, view):
-        return request.user and request.user.is_superuser
     
-class CourseAPIView(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.DestroyModelMixin,GenericAPIView):
+# API view
+class CourseViewset(viewsets.ModelViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     lookup_field = 'course_id'
-    permission_classes = [IsAuthenticated, SuperuserPermission]
     
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+    @action(detail=False, methods=['POST'])
+    def user_courses(self, request):
+        email = request.query_params.get('email')
+        if not email:
+            return Response({'error': 'Email parameter is required'}, status=400)
+        try:
+            student = Student.objects.get(user__email=email)
+        except ObjectDoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+        enrolled_courses = Enrollment.objects.filter(user_id=student).values('course_id')
+        courses = Course.objects.filter(course_id__in=enrolled_courses)
+        serializer = CourseSerializer(courses, many=True)
 
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-class CourseListAPIView(mixins.ListModelMixin, mixins.CreateModelMixin, GenericAPIView):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-    lookup_field = 'course_id'
-    permission_classes = [IsAuthenticated, SuperuserPermission]
+        return Response(serializer.data)
     
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-    
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-class CourseCreateAPIView(CreateAPIView):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticated, SuperuserPermission]
-
-   
 # function based views
 def course_detail_view(request, course_id):
     course = Course.objects.get(course_id=course_id)

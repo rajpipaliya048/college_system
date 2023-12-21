@@ -5,12 +5,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
+from rest_framework_simplejwt.views import (TokenObtainPairView,TokenRefreshView,)
 from users import views as userviews
 from users.views import Actions, SignupView, LoginView, LogoutView, EditProfileView, SendEmail, UpdateUserFromCsv, CsvReport, PaymentSelectionView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', CourseListView.as_view(), name='home'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('login/', LoginView.as_view(), name = 'login'),
     path('signup/', SignupView.as_view(), name = 'signup'),
