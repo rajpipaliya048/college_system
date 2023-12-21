@@ -16,6 +16,8 @@ services:
         container_name: college_db
         volumes:
           - ./data.sql:/docker-entrypoint-initdb.d/data.sql
+        ports:
+            - "3306:3306"
         environment:
           MYSQL_DATABASE: mycollege
           MYSQL_ROOT_PASSWORD: 09888
