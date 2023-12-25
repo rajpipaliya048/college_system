@@ -18,6 +18,10 @@ class Department(models.Model):
     def __str__(self):
         return self.department_name
 
+class CourseManager(models.Manager):
+    def free_courses(self):
+        return super().get_queryset().filter(fees=0)
+
 class Course(models.Model):
     course_id = models.CharField(max_length=6, primary_key=True, validators=[validate_course_id])
     course_name = models.CharField(max_length=256)
@@ -29,6 +33,8 @@ class Course(models.Model):
     fees = models.PositiveIntegerField(default=0)
     html_input = models.TextField(null=True)
     
+    objects = CourseManager()
+    
     def __str__(self):
         return self.course_id
     
@@ -38,11 +44,17 @@ class Course(models.Model):
     def snippet(self):
         return self.course_details[:70] + '...'  
     
+class EnrollsManager(models.Manager):
+    def active_enrolls(self):
+        return super().get_queryset().filter(isactive=True)
+
 class Enrollment(models.Model):
     user_id = models.ForeignKey(Student, on_delete= models.CASCADE)
     course_id = models.ForeignKey(Course, on_delete= models.CASCADE)
     enrollment_date = models.DateField()
     isactive = models.BooleanField(default=True)
+    
+    objects = EnrollsManager()
     
     
     def __str__(self):
