@@ -34,7 +34,6 @@ urlpatterns = [
     path('csv-report/', CsvReport.as_view(), name='csv_report'),
     path('actions/', Actions.as_view(), name='actions'),
     path('payment-selection/', PaymentSelectionView.as_view(), name='payment_selection'),
-    # path('api/', include('course.urls')),
 
 
 
