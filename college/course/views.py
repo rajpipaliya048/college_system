@@ -127,7 +127,7 @@ class CourseUnenrollView(View):
     
 # API view
 class CourseViewset(viewsets.ModelViewSet):
-    authentication_classes = [JWTAuthentication]
+    # authentication_classes = [JWTAuthentication]
     permission_classes = [IsAdminUser]
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
